@@ -1,0 +1,229 @@
+/* Container */
+.jobs-container {
+  padding: 0rem;
+  min-height: 100vh;
+  animation: fadeIn 0.4s ease-in;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Title */
+.jobs-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+  text-align: center;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(30, 58, 138, 0.4);
+}
+
+/* Error and Empty States */
+.jobs-error {
+  color: #d32f2f;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.jobs-empty {
+  font-style: italic;
+  color: #777;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+/* Grid Layout */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Job Card */
+.job-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 20px rgba(30, 58, 138, 0.1),
+    0 4px 8px rgba(30, 58, 138, 0.05);
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 6px;
+  background: linear-gradient(90deg, #1e3a8a 0%, #d32f2f 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.job-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow:
+    0 16px 40px rgba(30, 58, 138, 0.15),
+    0 8px 16px rgba(30, 58, 138, 0.1);
+}
+
+/* Job Header */
+.job-header h4 {
+  font-size: 1.3rem;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  user-select: none;
+}
+
+.job-header p {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  user-select: none;
+}
+
+/* Job Body */
+.job-body p {
+  margin: 0.5rem 0;
+  color: #444b6e;
+  font-size: 0.975rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  user-select: none;
+}
+
+/* Icons color */
+.job-header svg,
+.job-body svg {
+  color: #d32f2f;
+  min-width: 18px;
+  min-height: 18px;
+}
+
+/* Job Footer */
+.job-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-description {
+  font-style: italic;
+  color: #6b7280;
+  font-size: 0.95rem;
+  flex-grow: 1;
+  margin-right: 1rem;
+  user-select: text;
+}
+
+/* Status Badge */
+.job-status {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: white;
+  user-select: none;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.status-open {
+  background-color: #22c55e; /* Green */
+  box-shadow: 0 0 12px #22c55e88;
+}
+
+.status-closed {
+  background-color: #ef4444; /* Red */
+  box-shadow: 0 0 12px #ef444488;
+}
+
+.status-pending {
+  background-color: #f59e0b; /* Amber */
+  box-shadow: 0 0 12px #f59e0b88;
+}
+
+.status-default {
+  background-color: #6b7280; /* Gray */
+  box-shadow: 0 0 12px #6b728088;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .jobs-title {
+    font-size: 1.8rem;
+  }
+
+  .job-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .job-header h4 {
+    font-size: 1.1rem;
+  }
+
+  .job-body p {
+    font-size: 0.9rem;
+  }
+
+  .job-description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .jobs-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

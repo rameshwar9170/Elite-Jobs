@@ -1,0 +1,138 @@
+/* Container */
+.providers-container {
+  padding: 0rem;
+  background-color: #f4f7fb;
+  min-height: 100%;
+  animation: fadeIn 0.3s ease-in;
+  box-sizing: border-box;
+}
+
+/* Title */
+.providers-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #12274d;
+  margin-bottom: 1.25rem;
+}
+
+/* Error and Empty States */
+.providers-error {
+  color: #e63946;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.providers-empty {
+  font-style: italic;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Table Wrapper */
+.providers-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  background-color: #ffffff;
+  animation: fadeInUp 0.4s ease;
+}
+
+/* Table Base */
+.providers-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+/* Table Head */
+.providers-table thead {
+  background-color: #12274d;
+  color: #ffffff;
+}
+
+.providers-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+/* Table Body */
+.providers-table td {
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover Row */
+.providers-table tbody tr:hover {
+  background-color: #eef3ff;
+  transform: scale(1.005);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .providers-title {
+    font-size: 1.5rem;
+  }
+
+  .providers-table th,
+  .providers-table td {
+    font-size: 0.9rem;
+    padding: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .providers-title {
+    font-size: 1.3rem;
+  }
+
+  .providers-table th,
+  .providers-table td {
+    font-size: 0.85rem;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .providers-container {
+    padding: 1rem;
+  }
+
+  .providers-title {
+    font-size: 1.1rem;
+  }
+
+  .providers-table {
+    min-width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

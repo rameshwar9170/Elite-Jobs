@@ -1,0 +1,146 @@
+/* Layout */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+   background: linear-gradient(135deg, #f7faff, #e0e9ff);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background-color: #0f1e40;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem; /* vertical = 0.2rem, horizontal = 1rem */
+  font-size: 1rem;
+  background-color: #12274d;
+  border-bottom: 1px solid #233a5e;
+}
+
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* Navigation */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.nav-item {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: none;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background-color: #1a3360;
+}
+
+.nav-item.active {
+  background-color: #e63946;
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content.full-width {
+  margin-left: 0;
+}
+
+/* Header */
+.header {
+  background-color: #0f1e40;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu-button,
+.logout-button {
+  background-color: #e63946;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.menu-button:hover,
+.logout-button:hover {
+  background-color: #d62828;
+}
+
+/* Main Section */
+.main-section {
+  padding: 1.5rem;
+  background-color: #f4f6f9;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Loading */
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  background-color: #f4f6f9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.closed {
+    transform: translateX(-100%);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+}

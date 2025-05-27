@@ -1,0 +1,123 @@
+/* Container */
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f7faff, #e0e9ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeIn 0.4s ease-in;
+}
+
+/* Card */
+.login-card {
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 14px;
+  box-shadow:
+    0 12px 32px rgba(30, 58, 138, 0.12),
+    0 6px 12px rgba(30, 58, 138, 0.06);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  user-select: none;
+}
+
+/* Title */
+.login-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(30, 58, 138, 0.4);
+  user-select: text;
+}
+
+/* Error message */
+.login-error {
+  color: #d32f2f;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  user-select: text;
+}
+
+/* Inputs */
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 1.3rem;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #374151;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  outline-offset: 2px;
+  user-select: text;
+}
+
+.login-input:focus {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 8px #1e3a8a88;
+  outline: none;
+}
+
+.login-input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Button */
+.login-button {
+  width: 100%;
+  padding: 14px 0;
+  background-color: #1e3a8a;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 15px #1e3a8a88;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #144270;
+  box-shadow:
+    0 10px 20px #144270cc;
+}
+
+.login-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+  .login-title {
+    font-size: 1.8rem;
+  }
+}

@@ -8,6 +8,7 @@ import Providers from './Providers';
 import Jobs from './Jobs';
 import Download from './Download';
 import './Dashboard.css';
+import DeleteAccount from './DeleteAccount';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -52,6 +53,7 @@ const Dashboard = () => {
     { name: 'Seekers', icon: <FaUser />, component: Seekers },
     { name: 'Providers', icon: <FaBuilding />, component: Providers },
     { name: 'Download', icon: <FaDownload />, component: Download },
+    { name: 'Delete Account', icon: <FaDownload />, component: DeleteAccount },
   ];
 
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;

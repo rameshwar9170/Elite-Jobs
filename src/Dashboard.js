@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaBriefcase, FaUser, FaBuilding } from 'react-icons/fa';
+import { FaBars, FaTimes, FaBriefcase, FaUser, FaBuilding, FaDownload } from 'react-icons/fa';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -20,9 +20,9 @@ const Dashboard = () => {
     const unsubscribe = onAuthStateChanged(
       auth,
       (user) => {
-        if (user) {
-          setUser(user);
-        } else {
+        setUser(user);
+        // Only redirect to login if the active tab is not 'Download' and no user is authenticated
+        if (!user && activeTab !== 'Download') {
           navigate('/login');
         }
         setLoading(false);
@@ -30,11 +30,14 @@ const Dashboard = () => {
       (error) => {
         console.error('Auth error:', error);
         setLoading(false);
-        navigate('/login');
+        // Only redirect on error if the active tab is not 'Download'
+        if (activeTab !== 'Download') {
+          navigate('/login');
+        }
       }
     );
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, activeTab]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -48,7 +51,7 @@ const Dashboard = () => {
     { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },
     { name: 'Seekers', icon: <FaUser />, component: Seekers },
     { name: 'Providers', icon: <FaBuilding />, component: Providers },
-    { name: 'Download', icon: <FaBriefcase />, component: Download },
+    { name: 'Download', icon: <FaDownload />, component: Download },
   ];
 
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
@@ -93,9 +96,11 @@ const Dashboard = () => {
             <FaBars />
           </button>
           <h2>{activeTab}</h2>
-          <button className="logout-button" onClick={handleLogout}>
-            Logout
-          </button>
+          {user && (
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
         </header>
         <main className="main-section">
           {ActiveComponent ? <ActiveComponent /> : <p>Invalid Tab</p>}

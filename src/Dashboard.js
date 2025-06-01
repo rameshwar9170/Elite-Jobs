@@ -6,6 +6,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import Seekers from './Seekers';
 import Providers from './Providers';
 import Jobs from './Jobs';
+import Download from './Download';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -47,6 +48,7 @@ const Dashboard = () => {
     { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },
     { name: 'Seekers', icon: <FaUser />, component: Seekers },
     { name: 'Providers', icon: <FaBuilding />, component: Providers },
+    { name: 'Download', icon: <FaBriefcase />, component: Download },
   ];
 
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;

@@ -3,7 +3,7 @@ import { db } from './firebase';
 import { ref, get, query, orderByChild, equalTo } from 'firebase/database';
 import './Providers.css';
 
-const Providers = () => {
+const Providers = ({ onProviderClick }) => {
   const [providers, setProviders] = useState([]);
   const [error, setError] = useState('');
 
@@ -28,7 +28,6 @@ const Providers = () => {
 
   return (
     <div className="providers-container">
-
       {error && <p className="providers-error">{error}</p>}
 
       {providers.length > 0 ? (
@@ -47,7 +46,11 @@ const Providers = () => {
             </thead>
             <tbody>
               {providers.map((provider) => (
-                <tr key={provider.id}>
+                <tr
+                  key={provider.id}
+                  onClick={() => onProviderClick(provider.id)} // 🔥 Pass ID to Dashboard
+                  style={{ cursor: 'pointer' }}
+                >
                   <td>{provider.name || '-'}</td>
                   <td>{provider.email || '-'}</td>
                   <td>{provider.phone || '-'}</td>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { ref, get, query, orderByChild, equalTo } from 'firebase/database';
-import './Seekers.css'; // <-- Create this file for styles
+import './Seekers.css';
 
-const Seekers = () => {
+const Seekers = ({ onSeekerClick }) => {
   const [seekers, setSeekers] = useState([]);
   const [error, setError] = useState('');
 
@@ -31,7 +31,6 @@ const Seekers = () => {
 
   return (
     <div className="seekers-container">
-  
       {error && <p className="seekers-error">{error}</p>}
       {seekers.length > 0 ? (
         <div className="seekers-table-container">
@@ -50,7 +49,7 @@ const Seekers = () => {
             </thead>
             <tbody>
               {seekers.map((seeker) => (
-                <tr key={seeker.id}>
+                <tr key={seeker.id} className="clickable-row" onClick={() => onSeekerClick(seeker.id)}>
                   <td>{seeker.name}</td>
                   <td>{seeker.email}</td>
                   <td>{seeker.phone}</td>

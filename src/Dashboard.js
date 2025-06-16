@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaBriefcase, FaUser, FaBuilding, FaDownload } from 'react-icons/fa';
+import {
+  FaBars,
+  FaTimes,
+  FaBriefcase,
+  FaUser,
+  FaBuilding,
+  FaDownload,
+} from 'react-icons/fa';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -7,14 +14,19 @@ import Seekers from './Seekers';
 import Providers from './Providers';
 import Jobs from './Jobs';
 import Download from './Download';
-import './Dashboard.css';
 import DeleteAccount from './DeleteAccount';
+import SeekerProfile from './SeekerProfile';
+import ProviderProfile from './ProviderProfile';
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('Seekers');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedSeekerId, setSelectedSeekerId] = useState(null);
+  const [selectedProviderId, setSelectedProviderId] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +34,6 @@ const Dashboard = () => {
       auth,
       (user) => {
         setUser(user);
-        // Only redirect to login if the active tab is not 'Download' and no user is authenticated
         if (!user && activeTab !== 'Download') {
           navigate('/login');
         }
@@ -31,7 +42,6 @@ const Dashboard = () => {
       (error) => {
         console.error('Auth error:', error);
         setLoading(false);
-        // Only redirect on error if the active tab is not 'Download'
         if (activeTab !== 'Download') {
           navigate('/login');
         }
@@ -46,6 +56,19 @@ const Dashboard = () => {
     signOut(auth)
       .then(() => navigate('/login'))
       .catch((error) => console.error('Logout error:', error));
+  };
+
+  const handleSeekerClick = (id) => {
+    setSelectedSeekerId(id);
+  };
+
+  const handleProviderClick = (id) => {
+    setSelectedProviderId(id);
+  };
+
+  const handleBackToList = () => {
+    setSelectedSeekerId(null);
+    setSelectedProviderId(null);
   };
 
   const menuItems = [
@@ -82,6 +105,8 @@ const Dashboard = () => {
               className={`nav-item ${activeTab === item.name ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab(item.name);
+                setSelectedSeekerId(null);
+                setSelectedProviderId(null);
                 if (window.innerWidth < 768) setIsSidebarOpen(false);
               }}
             >
@@ -104,8 +129,20 @@ const Dashboard = () => {
             </button>
           )}
         </header>
+
         <main className="main-section">
-          {ActiveComponent ? <ActiveComponent /> : <p>Invalid Tab</p>}
+          {selectedSeekerId ? (
+            <SeekerProfile id={selectedSeekerId} onBack={handleBackToList} />
+          ) : selectedProviderId ? (
+            <ProviderProfile id={selectedProviderId} onBack={handleBackToList} />
+          ) : ActiveComponent ? (
+            <ActiveComponent
+              onSeekerClick={handleSeekerClick}
+              onProviderClick={handleProviderClick}
+            />
+          ) : (
+            <p>Invalid Tab</p>
+          )}
         </main>
       </div>
     </div>

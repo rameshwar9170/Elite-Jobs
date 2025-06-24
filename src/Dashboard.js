@@ -5,6 +5,8 @@ import {
   FaBriefcase,
   FaUser,
   FaBuilding,
+  FaTrash,
+  FaUserPlus,
   FaDownload,
 } from 'react-icons/fa';
 import { auth } from './firebase';
@@ -18,6 +20,7 @@ import DeleteAccount from './DeleteAccount';
 import SeekerProfile from './SeekerProfile';
 import ProviderProfile from './ProviderProfile';
 import './Dashboard.css';
+import AddProviders from './AddProviders';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -71,13 +74,14 @@ const Dashboard = () => {
     setSelectedProviderId(null);
   };
 
-  const menuItems = [
-    { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },
-    { name: 'Seekers', icon: <FaUser />, component: Seekers },
-    { name: 'Providers', icon: <FaBuilding />, component: Providers },
-    { name: 'Download', icon: <FaDownload />, component: Download },
-    { name: 'Delete Account', icon: <FaDownload />, component: DeleteAccount },
-  ];
+const menuItems = [
+  { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },               // Job-related
+  { name: 'Seekers', icon: <FaUser />, component: Seekers },              // Single user icon for job seekers
+  { name: 'Providers', icon: <FaBuilding />, component: Providers },      // Building for companies/providers
+  { name: 'Download', icon: <FaDownload />, component: Download },        // File download icon
+  { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },// Trash bin icon for delete
+  { name: 'Add Providers', icon: <FaUserPlus />, component: AddProviders }// User-plus icon for adding
+];
 
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 

@@ -6,6 +6,7 @@ import Download from './Download';
 import DeleteAccount from './DeleteAccount';
 import SeekerProfile from './SeekerProfile';
 import ProviderProfile from './ProviderProfile';
+import AddProviders from './AddProviders';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/delete-account" element={<DeleteAccount />} />
         <Route path="/seeker-profile/:id" element={<SeekerProfile />} />
         <Route path="/provider/:id" element={<ProviderProfile />} />
+        <Route path='/add-providers' element={<AddProviders />} />
 
       </Routes>
     </Router>

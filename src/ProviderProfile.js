@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ref, get, remove, update } from 'firebase/database';
 import { db } from './firebase';
-import './SeekerProfile.css'; // Reusing the styling
+import './SeekerProfile.css';
 
 const ProviderProfile = ({ id, onBack }) => {
   const [provider, setProvider] = useState(null);
@@ -21,7 +21,7 @@ const ProviderProfile = ({ id, onBack }) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           setProvider(data);
-          setFormData(data); // Pre-fill form data
+          setFormData(data);
         } else {
           setError('Provider not found');
         }
@@ -39,14 +39,40 @@ const ProviderProfile = ({ id, onBack }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const updated = { ...formData, [name]: value };
+
+    if (name === 'subscriptionType') {
+      if (value === 'Basic') {
+        updated.subscriptionPrice = 3999;
+        updated.subscriptionDuration = '6 months';
+        updated.expiryDate = new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString();
+      } else if (value === 'Elite') {
+        updated.subscriptionPrice = 6999;
+        updated.subscriptionDuration = '12 months';
+        updated.expiryDate = new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString();
+      } else {
+        updated.subscriptionPrice = null;
+        updated.subscriptionDuration = null;
+        updated.expiryDate = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(); // e.g. trial or dummy value
+      }
+    }
+
+    setFormData(updated);
   };
 
   const handleUpdate = () => {
-    update(ref(db, `EliteJobs/users/${id}`), formData)
+    const updateData = { ...formData };
+
+    // Remove subscription fields if 'None' selected
+    if (formData.subscriptionType === 'None') {
+      updateData.subscriptionPrice = null;
+      updateData.subscriptionDuration = null;
+    }
+
+    update(ref(db, `EliteJobs/users/${id}`), updateData)
       .then(() => {
         alert('Profile updated successfully');
-        setProvider(formData);
+        setProvider(updateData);
         setEditing(false);
       })
       .catch((err) => alert('Update failed: ' + err.message));
@@ -63,7 +89,6 @@ const ProviderProfile = ({ id, onBack }) => {
 
         {editing ? (
           <div className="profile-form">
-            {/* Editable Fields */}
             {[
               'name', 'email', 'phone', 'district',
               'companyName', 'industry', 'location', 'role'
@@ -79,7 +104,6 @@ const ProviderProfile = ({ id, onBack }) => {
               </div>
             ))}
 
-            {/* Online Status Dropdown */}
             <div className="form-group">
               <label>Online:</label>
               <select
@@ -94,7 +118,18 @@ const ProviderProfile = ({ id, onBack }) => {
               </select>
             </div>
 
-            {/* Profile Visibility Dropdown */}
+            <div className="form-group">
+              <label>Is Active?</label>
+              <select
+                name="isActive"
+                value={formData.isActive || 'Yes'}
+                onChange={handleChange}
+              >
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
             <div className="form-group">
               <label>Profile Visibility:</label>
               <select
@@ -106,6 +141,32 @@ const ProviderProfile = ({ id, onBack }) => {
                 <option value="Private">Private</option>
               </select>
             </div>
+
+            <div className="form-group">
+              <label>Subscription Type:</label>
+              <select
+                name="subscriptionType"
+                value={formData.subscriptionType || 'None'}
+                onChange={handleChange}
+              >
+                <option value="None">None</option>
+                <option value="Basic">Basic - ₹3999 (6 months)</option>
+                <option value="Elite">Elite - ₹6999 (12 months)</option>
+              </select>
+            </div>
+
+            {formData.subscriptionType !== 'None' && (
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Price (₹):</label>
+                  <input type="text" value={formData.subscriptionPrice || ''} readOnly />
+                </div>
+                <div className="form-group">
+                  <label>Duration:</label>
+                  <input type="text" value={formData.subscriptionDuration || ''} readOnly />
+                </div>
+              </div>
+            )}
 
             <div className="profile-actions">
               <button className="update-button" onClick={handleUpdate}>Save</button>
@@ -125,6 +186,15 @@ const ProviderProfile = ({ id, onBack }) => {
               <p><strong>Online:</strong> {provider.isOnline ? 'Online' : 'Offline'}</p>
               <p><strong>Last Active:</strong> {new Date(provider.lastActive).toLocaleString()}</p>
               <p><strong>Profile Visibility:</strong> {provider.profileVisibility}</p>
+              <p><strong>Is Active:</strong> {provider.isActive}</p>
+              <p><strong>Subscription:</strong> {provider.subscriptionType || 'None'}</p>
+              {provider.subscriptionType !== 'None' && (
+                <>
+                  <p><strong>Price:</strong> ₹{provider.subscriptionPrice}</p>
+                  <p><strong>Duration:</strong> {provider.subscriptionDuration}</p>
+                </>
+              )}
+              {/* expiryDate is saved but not shown */}
             </div>
 
             <div className="profile-actions">

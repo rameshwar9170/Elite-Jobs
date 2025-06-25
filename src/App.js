@@ -7,6 +7,9 @@ import DeleteAccount from './DeleteAccount';
 import SeekerProfile from './SeekerProfile';
 import ProviderProfile from './ProviderProfile';
 import AddProviders from './AddProviders';
+import ContactUs from './ContactUs';
+import TermsAndConditions from './TermsAndConditions';
+import RefundPolicy from './RefundPolicy';
 
 const App = () => {
   return (
@@ -19,6 +22,9 @@ const App = () => {
         <Route path="/seeker-profile/:id" element={<SeekerProfile />} />
         <Route path="/provider/:id" element={<ProviderProfile />} />
         <Route path='/add-providers' element={<AddProviders />} />
+        <Route path='/contact-us' element={<ContactUs />} />
+        <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
+        <Route path='/refund-policy' element={<RefundPolicy />} />
 
       </Routes>
     </Router>

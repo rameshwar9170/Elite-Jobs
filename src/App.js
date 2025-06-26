@@ -10,6 +10,9 @@ import AddProviders from './AddProviders';
 import ContactUs from './ContactUs';
 import TermsAndConditions from './TermsAndConditions';
 import RefundPolicy from './RefundPolicy';
+import AddSeeker from './AddSeeker';
+import AddJob from './AddJob';
+import Subscriptions from './Subscriptions';
 
 const App = () => {
   return (
@@ -22,9 +25,12 @@ const App = () => {
         <Route path="/seeker-profile/:id" element={<SeekerProfile />} />
         <Route path="/provider/:id" element={<ProviderProfile />} />
         <Route path='/add-providers' element={<AddProviders />} />
+        <Route path='/add-seeker' element={<AddSeeker />} />
         <Route path='/contact-us' element={<ContactUs />} />
         <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
         <Route path='/refund-policy' element={<RefundPolicy />} />
+        <Route path="/add-job/:providerId" element={<AddJob />} />
+        <Route path="/subscriptions_users" element={<Subscriptions />} />
 
       </Routes>
     </Router>

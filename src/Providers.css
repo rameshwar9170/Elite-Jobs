@@ -1,18 +1,20 @@
 /* Container */
 .providers-container {
-  padding: 0rem;
+  padding: 1rem 2rem;
   background-color: #f4f7fb;
   min-height: 100%;
   animation: fadeIn 0.3s ease-in;
   box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Title */
 .providers-title {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #12274d;
   margin-bottom: 1.25rem;
+  text-align: center;
 }
 
 /* Error and Empty States */
@@ -20,12 +22,15 @@
   color: #e63946;
   margin-bottom: 1rem;
   font-weight: bold;
+  text-align: center;
 }
 
 .providers-empty {
   font-style: italic;
   color: #555;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 2rem;
 }
 
 /* Table Wrapper */
@@ -41,7 +46,7 @@
 .providers-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
+  min-width: 900px;
 }
 
 /* Table Head */
@@ -55,7 +60,6 @@
   text-align: left;
   font-size: 1rem;
   letter-spacing: 0.5px;
-  transition: background-color 0.3s ease;
   white-space: nowrap;
 }
 
@@ -65,20 +69,42 @@
   font-size: 0.95rem;
   color: #333;
   border-bottom: 1px solid #e0e0e0;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  vertical-align: top;
+  max-width: 200px;
+  word-break: break-word;
 }
 
 /* Hover Row */
 .providers-table tbody tr:hover {
   background-color: #eef3ff;
-  transform: scale(1.005);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Action Button */
+.add-job-button {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.add-job-button:hover {
+  background-color: #0f2564;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
+  .providers-container {
+    padding: 1rem;
+  }
+
   .providers-title {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
   }
 
   .providers-table th,
@@ -90,7 +116,7 @@
 
 @media (max-width: 768px) {
   .providers-title {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   .providers-table th,
@@ -98,19 +124,35 @@
     font-size: 0.85rem;
     padding: 0.6rem;
   }
+
+  .add-job-button {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
 }
 
 @media (max-width: 480px) {
   .providers-container {
-    padding: 1rem;
+    padding: 1rem 0.5rem;
   }
 
   .providers-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .providers-table {
     min-width: 100%;
+  }
+
+  .providers-table th,
+  .providers-table td {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .add-job-button {
+    font-size: 0.75rem;
+    padding: 4px 8px;
   }
 }
 

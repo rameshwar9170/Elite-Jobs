@@ -6,6 +6,8 @@ import {
   FaUser,
   FaBuilding,
   FaTrash,
+  FaMoneyCheckAlt,
+  FaUserEdit,
   FaUserPlus,
   FaDownload,
 } from 'react-icons/fa';
@@ -21,6 +23,8 @@ import SeekerProfile from './SeekerProfile';
 import ProviderProfile from './ProviderProfile';
 import './Dashboard.css';
 import AddProviders from './AddProviders';
+import AddSeeker from './AddSeeker';
+import Subscriptions from './Subscriptions';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -74,15 +78,20 @@ const Dashboard = () => {
     setSelectedProviderId(null);
   };
 
-const menuItems = [
-  { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },               // Job-related
-  { name: 'Seekers', icon: <FaUser />, component: Seekers },              // Single user icon for job seekers
-  { name: 'Providers', icon: <FaBuilding />, component: Providers },      // Building for companies/providers
-  { name: 'Download', icon: <FaDownload />, component: Download },        // File download icon
-  { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },// Trash bin icon for delete
-  { name: 'Add Providers', icon: <FaUserPlus />, component: AddProviders }// User-plus icon for adding
-];
+  const handleAddJobClick = (providerId) => {
+    navigate(`/add-job/${providerId}`);
+  };
 
+ const menuItems = [
+  { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },                        // Briefcase for jobs
+  { name: 'Seekers', icon: <FaUser />, component: Seekers },                      // User for job seekers
+  { name: 'Providers', icon: <FaBuilding />, component: Providers },            // Trash for delete
+  { name: 'Add Providers', icon: <FaUserEdit />, component: AddProviders },       // User edit for adding provider
+  { name: 'Add Seeker', icon: <FaUserEdit />, component: AddSeeker },             // User edit for adding seeker
+  { name: 'Subscriptions', icon: <FaMoneyCheckAlt />, component: Subscriptions }, 
+  { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
+  { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
+];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 
   if (loading) {
@@ -139,6 +148,11 @@ const menuItems = [
             <SeekerProfile id={selectedSeekerId} onBack={handleBackToList} />
           ) : selectedProviderId ? (
             <ProviderProfile id={selectedProviderId} onBack={handleBackToList} />
+          ) : activeTab === 'Providers' ? (
+            <Providers
+              onProviderClick={handleProviderClick}
+              onAddJobClick={handleAddJobClick}
+            />
           ) : ActiveComponent ? (
             <ActiveComponent
               onSeekerClick={handleSeekerClick}

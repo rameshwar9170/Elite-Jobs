@@ -3,7 +3,7 @@ import { db } from './firebase';
 import { ref, get, query, orderByChild, equalTo } from 'firebase/database';
 import './Providers.css';
 
-const Providers = ({ onProviderClick }) => {
+const Providers = ({ onProviderClick, onAddJobClick }) => {
   const [providers, setProviders] = useState([]);
   const [error, setError] = useState('');
 
@@ -41,23 +41,28 @@ const Providers = ({ onProviderClick }) => {
                 <th>District</th>
                 <th>Company Name</th>
                 <th>Industry</th>
-                <th>Location</th>
+                <th style={{ width: '150px' }}>Location</th> {/* Fixed Width */}
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {providers.map((provider) => (
-                <tr
-                  key={provider.id}
-                  onClick={() => onProviderClick(provider.id)} // 🔥 Pass ID to Dashboard
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td>{provider.name || '-'}</td>
-                  <td>{provider.email || '-'}</td>
-                  <td>{provider.phone || '-'}</td>
-                  <td>{provider.district || '-'}</td>
-                  <td>{provider.companyName || '-'}</td>
-                  <td>{provider.industry || '-'}</td>
-                  <td>{provider.location || '-'}</td>
+                <tr key={provider.id}>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.name || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.email || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.phone || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.district || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.companyName || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.industry || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>{provider.location || '-'}</td>
+                  <td>
+                    <button
+                      className="add-job-button"
+                      onClick={() => onAddJobClick(provider.id)}
+                    >
+                      Add Job
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

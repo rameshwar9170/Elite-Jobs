@@ -51,9 +51,9 @@ const ProviderProfile = ({ id, onBack }) => {
         updated.subscriptionDuration = '12 months';
         updated.expiryDate = new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString();
       } else {
-        updated.subscriptionPrice = null;
-        updated.subscriptionDuration = null;
-        updated.expiryDate = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(); // e.g. trial or dummy value
+        updated.subscriptionPrice = '';
+        updated.subscriptionDuration = '';
+        updated.expiryDate = '';
       }
     }
 
@@ -62,13 +62,6 @@ const ProviderProfile = ({ id, onBack }) => {
 
   const handleUpdate = () => {
     const updateData = { ...formData };
-
-    // Remove subscription fields if 'None' selected
-    if (formData.subscriptionType === 'None') {
-      updateData.subscriptionPrice = null;
-      updateData.subscriptionDuration = null;
-    }
-
     update(ref(db, `EliteJobs/users/${id}`), updateData)
       .then(() => {
         alert('Profile updated successfully');
@@ -86,12 +79,19 @@ const ProviderProfile = ({ id, onBack }) => {
       <button onClick={onBack} className="profile-back-button">← Back</button>
       <div className="profile-card">
         <h2 className="profile-name">{provider.name}</h2>
+        {provider.companyLogoUrl && (
+          <img
+            src={`https://firebasestorage.googleapis.com/v0/b/<your-firebase-project-id>.appspot.com/o/${encodeURIComponent(provider.companyLogoUrl)}?alt=media`}
+            alt="Company Logo"
+            className="profile-image"
+          />
+        )}
 
         {editing ? (
           <div className="profile-form">
             {[
               'name', 'email', 'phone', 'district',
-              'companyName', 'industry', 'location', 'role'
+              'companyName', 'industry', 'location', 'role', 'paymentId'
             ].map((field) => (
               <div className="form-group" key={field}>
                 <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
@@ -156,16 +156,20 @@ const ProviderProfile = ({ id, onBack }) => {
             </div>
 
             {formData.subscriptionType !== 'None' && (
-              <div className="form-row">
+              <>
                 <div className="form-group">
                   <label>Price (₹):</label>
-                  <input type="text" value={formData.subscriptionPrice || ''} readOnly />
+                  <input type="number" name="subscriptionPrice" value={formData.subscriptionPrice || ''} onChange={handleChange} />
                 </div>
                 <div className="form-group">
                   <label>Duration:</label>
-                  <input type="text" value={formData.subscriptionDuration || ''} readOnly />
+                  <input type="text" name="subscriptionDuration" value={formData.subscriptionDuration || ''} readOnly />
                 </div>
-              </div>
+                <div className="form-group">
+                  <label>Expiry Date:</label>
+                  <input type="text" value={new Date(formData.expiryDate).toLocaleString()} readOnly />
+                </div>
+              </>
             )}
 
             <div className="profile-actions">
@@ -183,6 +187,7 @@ const ProviderProfile = ({ id, onBack }) => {
               <p><strong>Industry:</strong> {provider.industry}</p>
               <p><strong>Location:</strong> {provider.location}</p>
               <p><strong>Role:</strong> {provider.role}</p>
+              <p><strong>Payment ID:</strong> {provider.paymentId}</p>
               <p><strong>Online:</strong> {provider.isOnline ? 'Online' : 'Offline'}</p>
               <p><strong>Last Active:</strong> {new Date(provider.lastActive).toLocaleString()}</p>
               <p><strong>Profile Visibility:</strong> {provider.profileVisibility}</p>
@@ -192,9 +197,9 @@ const ProviderProfile = ({ id, onBack }) => {
                 <>
                   <p><strong>Price:</strong> ₹{provider.subscriptionPrice}</p>
                   <p><strong>Duration:</strong> {provider.subscriptionDuration}</p>
+                  <p><strong>Expiry Date:</strong> {new Date(provider.expiryDate).toLocaleString()}</p>
                 </>
               )}
-              {/* expiryDate is saved but not shown */}
             </div>
 
             <div className="profile-actions">

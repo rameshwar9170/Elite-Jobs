@@ -26,6 +26,7 @@ import AddProviders from './AddProviders';
 import AddSeeker from './AddSeeker';
 import Subscriptions from './Subscriptions';
 import Notifications from './Notifications';
+import ManageSubscriptions from './ManageSubscriptions.js'; // Import ManageSubscriptions component
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -93,6 +94,7 @@ const Dashboard = () => {
   { name: "Notifications", icon: <FaUserPlus />, component: Notifications }, // User plus for notifications
   // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
   // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
+  { name: 'Manage Subscriptions', icon: <FaMoneyCheckAlt />, component: ManageSubscriptions }, // Money/check for manage subscriptions
 ];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 

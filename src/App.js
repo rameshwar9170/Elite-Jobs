@@ -15,6 +15,7 @@ import AddJob from './AddJob';
 import Subscriptions from './Subscriptions';
 import Applications from './Applications';
 import Notifications from './Notifications';
+import ManageSubscriptions from './ManageSubscriptions.js';
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/subscriptions_users" element={<Subscriptions />} />
        <Route path="/Applications/:id" element={<Applications />} />
        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/manage-subscriptions" element={<ManageSubscriptions />} />
 
       </Routes>
     </Router>

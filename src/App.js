@@ -13,6 +13,8 @@ import RefundPolicy from './RefundPolicy';
 import AddSeeker from './AddSeeker';
 import AddJob from './AddJob';
 import Subscriptions from './Subscriptions';
+import Applications from './Applications';
+import Notifications from './Notifications';
 
 const App = () => {
   return (
@@ -31,6 +33,8 @@ const App = () => {
         <Route path='/refund-policy' element={<RefundPolicy />} />
         <Route path="/add-job/:providerId" element={<AddJob />} />
         <Route path="/subscriptions_users" element={<Subscriptions />} />
+       <Route path="/Applications/:id" element={<Applications />} />
+       <Route path="/notifications" element={<Notifications />} />
 
       </Routes>
     </Router>

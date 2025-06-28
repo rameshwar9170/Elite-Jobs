@@ -25,6 +25,7 @@ import './Dashboard.css';
 import AddProviders from './AddProviders';
 import AddSeeker from './AddSeeker';
 import Subscriptions from './Subscriptions';
+import Notifications from './Notifications';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -89,8 +90,9 @@ const Dashboard = () => {
   { name: 'Add Providers', icon: <FaUserEdit />, component: AddProviders },       // User edit for adding provider
   { name: 'Add Seeker', icon: <FaUserEdit />, component: AddSeeker },             // User edit for adding seeker
   { name: 'Subscriptions', icon: <FaMoneyCheckAlt />, component: Subscriptions }, 
-  { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
-  { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
+  { name: "Notifications", icon: <FaUserPlus />, component: Notifications }, // User plus for notifications
+  // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
+  // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
 ];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 

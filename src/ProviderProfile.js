@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { ref, get, remove, update } from 'firebase/database';
 import { db } from './firebase';
+import { useNavigate } from 'react-router-dom'; 
 import './SeekerProfile.css';
+
 
 const ProviderProfile = ({ id, onBack }) => {
   const [provider, setProvider] = useState(null);
   const [formData, setFormData] = useState({});
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState('');
+  
 
   useEffect(() => {
     if (!id) {
@@ -70,6 +73,8 @@ const ProviderProfile = ({ id, onBack }) => {
       })
       .catch((err) => alert('Update failed: ' + err.message));
   };
+  
+const navigate = useNavigate();
 
   if (error) return <p className="profile-error">{error}</p>;
   if (!provider) return <p className="profile-loading">Loading...</p>;
@@ -203,6 +208,12 @@ const ProviderProfile = ({ id, onBack }) => {
             </div>
 
             <div className="profile-actions">
+              <button
+              className="view-jobs"
+              onClick={() => navigate(`./Applications/${id}`)} // navigate to application page
+            >
+              Applications
+            </button>
               <button className="update-button" onClick={() => setEditing(true)}>Update</button>
               <button className="delete-button" onClick={handleDelete}>Delete</button>
             </div>

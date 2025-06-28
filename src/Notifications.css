@@ -1,0 +1,65 @@
+.notification-container {
+  padding: 30px;
+  max-width: 550px;
+  margin: 40px auto;
+  background-color: #fefefe;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notification-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.notification-label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.notification-select,
+.notification-input,
+.notification-textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border 0.2s ease;
+}
+
+.notification-input:focus,
+.notification-textarea:focus,
+.notification-select:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.notification-textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.notification-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.notification-button:hover {
+  background-color: #2980b9;
+}

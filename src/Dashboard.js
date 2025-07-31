@@ -27,6 +27,10 @@ import AddSeeker from './AddSeeker';
 import Subscriptions from './Subscriptions';
 import Notifications from './Notifications';
 import ManageSubscriptions from './ManageSubscriptions.js'; // Import ManageSubscriptions component
+import MemberSub from './MemberSub'; // Import MemberSub component
+import Members from './Members.js';
+import HotelPlans from './HotelPlans'; // Import HotelPlans component
+import ReferralDashboard from './ReferralDashboard'; // Import HotelPlans component
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -95,6 +99,10 @@ const Dashboard = () => {
   // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
   // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
   { name: 'Manage Subscriptions', icon: <FaMoneyCheckAlt />, component: ManageSubscriptions }, // Money/check for manage subscriptions
+      { name: 'Manage Members', icon: <FaMoneyCheckAlt />, component: Members }, // Money/check for manage subscriptions
+    { name: 'Members Subscriptions', icon: <FaMoneyCheckAlt />, component: MemberSub },
+        { name: 'Hotel Plans', icon: <FaMoneyCheckAlt />, component: HotelPlans },
+        { name: 'Referrals', icon: <FaMoneyCheckAlt />, component: ReferralDashboard },
 ];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 

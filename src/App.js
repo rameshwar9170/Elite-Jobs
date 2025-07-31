@@ -16,6 +16,11 @@ import Subscriptions from './Subscriptions';
 import Applications from './Applications';
 import Notifications from './Notifications';
 import ManageSubscriptions from './ManageSubscriptions.js';
+import Delete from './Delete';
+import MemberSub from './MemberSub';
+import Members from "./Members";
+import HotelPlans from './HotelPlans'; // Import HotelPlans component
+import ReferralDashboard from './ReferralDashboard'; // Import ReferralDashboard component
 
 const App = () => {
   return (
@@ -37,7 +42,11 @@ const App = () => {
        <Route path="/Applications/:id" element={<Applications />} />
        <Route path="/notifications" element={<Notifications />} />
         <Route path="/manage-subscriptions" element={<ManageSubscriptions />} />
-
+        <Route path="/delete" element={<Delete />} />
+        <Route path="/member-sub" element={<MemberSub />} />
+        <Route path="/members" element={<Members />} />
+        <Route path="/hotel-plans" element={<HotelPlans />} />
+        <Route path="/referrals" element={<ReferralDashboard />} />
       </Routes>
     </Router>
   );

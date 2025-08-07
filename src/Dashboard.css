@@ -98,7 +98,8 @@
 }
 
 .menu-button,
-.logout-button {
+.logout-button,
+.member-button {
   background-color: #e63946;
   color: white;
   border: none;
@@ -108,7 +109,8 @@
 }
 
 .menu-button:hover,
-.logout-button:hover {
+.logout-button:hover,
+.member-button:hover {
   background-color: #d62828;
 }
 

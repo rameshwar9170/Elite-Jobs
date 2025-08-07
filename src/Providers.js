@@ -26,6 +26,12 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
       .catch((error) => setError('Failed to load providers: ' + error.message));
   }, []);
 
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    return date.toLocaleString(); // You can customize this format if needed
+  };
+
   return (
     <div className="providers-container">
       {error && <p className="providers-error">{error}</p>}
@@ -41,7 +47,8 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
                 <th>District</th>
                 <th>Company Name</th>
                 <th>Industry</th>
-                <th style={{ width: '150px' }}>Location</th> {/* Fixed Width */}
+                <th style={{ width: '150px' }}>Location</th>
+                <th>Last Active</th> {/* ✅ New Column */}
                 <th>Action</th>
               </tr>
             </thead>
@@ -55,6 +62,9 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
                   <td onClick={() => onProviderClick(provider.id)}>{provider.companyName || '-'}</td>
                   <td onClick={() => onProviderClick(provider.id)}>{provider.industry || '-'}</td>
                   <td onClick={() => onProviderClick(provider.id)}>{provider.location || '-'}</td>
+                  <td onClick={() => onProviderClick(provider.id)}>
+                    {formatTimestamp(provider.lastActive)} {/* ✅ Formatted timestamp */}
+                  </td>
                   <td>
                     <button
                       className="add-job-button"

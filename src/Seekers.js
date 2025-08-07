@@ -29,6 +29,12 @@ const Seekers = ({ onSeekerClick }) => {
       });
   }, []);
 
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'N/A';
+    const date = new Date(timestamp);
+    return date.toLocaleString(); // Shows both date and time
+  };
+
   return (
     <div className="seekers-container">
       {error && <p className="seekers-error">{error}</p>}
@@ -45,6 +51,7 @@ const Seekers = ({ onSeekerClick }) => {
                 <th>Experience</th>
                 <th>Skills</th>
                 <th>Resume</th>
+                <th>Last Active</th> {/* ✅ new column */}
               </tr>
             </thead>
             <tbody>
@@ -62,6 +69,7 @@ const Seekers = ({ onSeekerClick }) => {
                       View
                     </a>
                   </td>
+                  <td>{formatTimestamp(seeker.lastActive)}</td> {/* ✅ formatted */}
                 </tr>
               ))}
             </tbody>

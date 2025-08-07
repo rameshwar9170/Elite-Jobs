@@ -21,7 +21,8 @@ import MemberSub from './MemberSub';
 import Members from "./Members";
 import HotelPlans from './HotelPlans'; // Import HotelPlans component
 import ReferralDashboard from './ReferralDashboard'; // Import ReferralDashboard component
-
+import MemberDashboard from './MemberDashboard.js';
+import Application from './Application'; // Import Application component
 const App = () => {
   return (
     <Router>
@@ -32,21 +33,23 @@ const App = () => {
         <Route path="/delete-account" element={<DeleteAccount />} />
         <Route path="/seeker-profile/:id" element={<SeekerProfile />} />
         <Route path="/provider/:id" element={<ProviderProfile />} />
-        <Route path='/add-providers' element={<AddProviders />} />
-        <Route path='/add-seeker' element={<AddSeeker />} />
-        <Route path='/contact-us' element={<ContactUs />} />
-        <Route path='/terms-and-conditions' element={<TermsAndConditions />} />
-        <Route path='/refund-policy' element={<RefundPolicy />} />
+        <Route path="/add-providers" element={<AddProviders />} />
+        <Route path="/add-seeker" element={<AddSeeker />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
         <Route path="/add-job/:providerId" element={<AddJob />} />
         <Route path="/subscriptions_users" element={<Subscriptions />} />
-       <Route path="/Applications/:id" element={<Applications />} />
-       <Route path="/notifications" element={<Notifications />} />
+        <Route path="/Applications/:id" element={<Applications />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/manage-subscriptions" element={<ManageSubscriptions />} />
         <Route path="/delete" element={<Delete />} />
         <Route path="/member-sub" element={<MemberSub />} />
         <Route path="/members" element={<Members />} />
         <Route path="/hotel-plans" element={<HotelPlans />} />
         <Route path="/referrals" element={<ReferralDashboard />} />
+        <Route path="/member-dashboard" element={<MemberDashboard />} />
+        <Route path='application' element={<Application />} />
       </Routes>
     </Router>
   );

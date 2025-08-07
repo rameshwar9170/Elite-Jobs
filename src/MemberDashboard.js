@@ -31,9 +31,8 @@ import MemberSub from './MemberSub'; // Import MemberSub component
 import Members from './Members.js';
 import HotelPlans from './HotelPlans'; // Import HotelPlans component
 import ReferralDashboard from './ReferralDashboard'; // Import HotelPlans component
-import Application from './Application.js';
 
-const Dashboard = () => {
+const MemberDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('Seekers');
   const [user, setUser] = useState(null);
@@ -90,21 +89,20 @@ const Dashboard = () => {
   };
 
  const menuItems = [
-  { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },                        // Briefcase for jobs
-  { name: 'Seekers', icon: <FaUser />, component: Seekers },                      // User for job seekers
-  { name: 'Providers', icon: <FaBuilding />, component: Providers },            // Trash for delete
-  { name: 'Add Providers', icon: <FaUserEdit />, component: AddProviders },       // User edit for adding provider
-  { name: 'Add Seeker', icon: <FaUserEdit />, component: AddSeeker },             // User edit for adding seeker
-  { name: 'Subscriptions', icon: <FaMoneyCheckAlt />, component: Subscriptions }, 
-  { name: "Notifications", icon: <FaUserPlus />, component: Notifications }, // User plus for notifications
-  // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
-  // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
-  { name: 'Manage Subscriptions', icon: <FaMoneyCheckAlt />, component: ManageSubscriptions }, // Money/check for manage subscriptions
-    //   { name: 'Manage Members', icon: <FaMoneyCheckAlt />, component: Members }, // Money/check for manage subscriptions
-    // { name: 'Members Subscriptions', icon: <FaMoneyCheckAlt />, component: MemberSub },
-    //     { name: 'Hotel Plans', icon: <FaMoneyCheckAlt />, component: HotelPlans },
-        // { name: 'Referrals', icon: <FaMoneyCheckAlt />, component: ReferralDashboard },
-        { name: 'Applications', icon: <FaMoneyCheckAlt />, component: Application },
+//   { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },                        // Briefcase for jobs
+//   { name: 'Seekers', icon: <FaUser />, component: Seekers },                      // User for job seekers
+//   { name: 'Providers', icon: <FaBuilding />, component: Providers },            // Trash for delete
+//   { name: 'Add Providers', icon: <FaUserEdit />, component: AddProviders },       // User edit for adding provider
+//   { name: 'Add Seeker', icon: <FaUserEdit />, component: AddSeeker },             // User edit for adding seeker
+//   { name: 'Subscriptions', icon: <FaMoneyCheckAlt />, component: Subscriptions }, 
+//   { name: "Notifications", icon: <FaUserPlus />, component: Notifications }, // User plus for notifications
+//   // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
+//   // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
+//   { name: 'Manage Subscriptions', icon: <FaMoneyCheckAlt />, component: ManageSubscriptions }, // Money/check for manage subscriptions
+      { name: 'Manage Members', icon: <FaMoneyCheckAlt />, component: Members }, // Money/check for manage subscriptions
+    { name: 'Members Subscriptions', icon: <FaMoneyCheckAlt />, component: MemberSub },
+        { name: 'Hotel Plans', icon: <FaMoneyCheckAlt />, component: HotelPlans },
+        { name: 'Referrals', icon: <FaMoneyCheckAlt />, component: ReferralDashboard },
 ];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 
@@ -118,9 +116,9 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <div className={`sidebar ${isSidebarOpen ? '' : 'closed'}`}>
+      <div className={`sidebar ${isSidebarOpen ? "" : "closed"}`}>
         <div className="sidebar-header">
-          <h1>Elite Jobs</h1>
+          <h1>Member Dashboard</h1>
           <button className="toggle-button" onClick={toggleSidebar}>
             <FaTimes />
           </button>
@@ -129,7 +127,7 @@ const Dashboard = () => {
           {menuItems.map((item) => (
             <button
               key={item.name}
-              className={`nav-item ${activeTab === item.name ? 'active' : ''}`}
+              className={`nav-item ${activeTab === item.name ? "active" : ""}`}
               onClick={() => {
                 setActiveTab(item.name);
                 setSelectedSeekerId(null);
@@ -144,7 +142,7 @@ const Dashboard = () => {
         </nav>
       </div>
 
-      <div className={`main-content ${isSidebarOpen ? '' : 'full-width'}`}>
+      <div className={`main-content ${isSidebarOpen ? "" : "full-width"}`}>
         <header className="header">
           <button className="menu-button" onClick={toggleSidebar}>
             <FaBars />
@@ -154,11 +152,10 @@ const Dashboard = () => {
             <button className="logout-button" onClick={handleLogout}>
               Logout
             </button>
-            
           )}
 
-                  {user && (
-    <button className="member-button" onClick={() => navigate('/member-dashboard')}>
+                            {user && (
+    <button className="member-button" onClick={() => navigate('/')}>
   Member Dashboard
 </button>
 
@@ -171,8 +168,11 @@ const Dashboard = () => {
           {selectedSeekerId ? (
             <SeekerProfile id={selectedSeekerId} onBack={handleBackToList} />
           ) : selectedProviderId ? (
-            <ProviderProfile id={selectedProviderId} onBack={handleBackToList} />
-          ) : activeTab === 'Providers' ? (
+            <ProviderProfile
+              id={selectedProviderId}
+              onBack={handleBackToList}
+            />
+          ) : activeTab === "Providers" ? (
             <Providers
               onProviderClick={handleProviderClick}
               onAddJobClick={handleAddJobClick}
@@ -191,4 +191,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default MemberDashboard;

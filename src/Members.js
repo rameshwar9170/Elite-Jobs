@@ -1,76 +1,105 @@
 import React, { useEffect, useState } from 'react';
 import { ref, get } from 'firebase/database';
 import { db } from './firebase';
+import './Hotels.css'; // Use external CSS for clarity
 
-const Members = () => {
-  const [members, setMembers] = useState({});
+const Hotels = () => {
+  const [hotels, setHotels] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchHotels = async () => {
       try {
-        const membersRef = ref(db, 'members');
-        const snapshot = await get(membersRef);
+        const hotelsRef = ref(db, 'EliteJobs/hotels');
+        const snapshot = await get(hotelsRef);
         if (snapshot.exists()) {
-          setMembers(snapshot.val());
+          setHotels(snapshot.val());
         } else {
-          setError('No members found.');
+          setError('No hotels found.');
         }
       } catch (err) {
         console.error(err);
-        setError('Failed to load members.');
+        setError('Failed to load hotels.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMembers();
+    fetchHotels();
   }, []);
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: 30 }}>Loading...</div>;
-  if (error) return <div style={{ textAlign: 'center', color: 'red' }}>{error}</div>;
+  const openPopup = (hotel) => {
+    setSelectedHotel(hotel);
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    setSelectedHotel(null);
+  };
+
+  if (loading) return <div className="loading">Loading hotels...</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div style={{ padding: '30px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-        👥 All Members
-      </h2>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '20px'
-      }}>
-        {Object.entries(members).map(([id, member]) => (
-          <div key={id} style={{
-            background: '#fff',
-            borderRadius: '10px',
-            padding: '20px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-            borderLeft: member.hasActiveSubscription ? '5px solid green' : '5px solid gray'
-          }}>
-            <h3 style={{ margin: '0 0 10px', color: '#007BFF' }}>{member.name || 'Unnamed'}</h3>
-            <p style={{ margin: '5px 0' }}><strong>Email:</strong> {member.email || 'N/A'}</p>
-            <p style={{ margin: '5px 0' }}><strong>Address:</strong> {member.address || 'N/A'}</p>
-            <p style={{ margin: '10px 0', fontWeight: 'bold' }}>
-              {member.hasActiveSubscription ? '🟢 Active Subscriber' : '⚪ No Subscription'}
-            </p>
+    <>
+      <div className="hotels-container">
+        <h2 className="hotels-title">🏨 Hotels List</h2>
 
-            {member.hasActiveSubscription && (
-              <div style={{ fontSize: '14px', marginTop: '10px', background: '#f0f8ff', padding: '10px', borderRadius: '5px' }}>
-                <p style={{ margin: '5px 0' }}><strong>Plan:</strong> {member.subscriptionPlan}</p>
-                <p style={{ margin: '5px 0' }}><strong>Amount:</strong> ₹{member.subscriptionAmount}</p>
-                <p style={{ margin: '5px 0' }}><strong>Payment ID:</strong> {member.subscriptionPaymentId}</p>
-                <p style={{ margin: '5px 0' }}>
-                  <strong>Expiry:</strong> {new Date(member.subscriptionExpiry).toLocaleDateString()}
-                </p>
+        <div className="hotels-grid">
+          {Object.entries(hotels).map(([hotelId, hotel]) => (
+            <div
+              key={hotelId}
+              className="hotel-card"
+              onClick={() => openPopup(hotel)}
+              title="Click to view menu items"
+            >
+              {hotel.logoUrl && (
+                <img
+                  src={hotel.logoUrl}
+                  alt={hotel.name}
+                  className="hotel-logo"
+                />
+              )}
+              <h3 className="hotel-name">{hotel.name}</h3>
+              <p className="hotel-rating"><strong>Rating:</strong> {hotel.rating} ⭐</p>
+              <p className="hotel-address">{hotel.address}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showPopup && selectedHotel && (
+        <div className="popup-overlay" onClick={closePopup}>
+          <div
+            className="popup-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="popup-close" onClick={closePopup}>×</button>
+            <h2>{selectedHotel.name} - Menu</h2>
+            <p className="popup-address"><strong>Address:</strong> {selectedHotel.address}</p>
+
+            {selectedHotel.menu && Object.values(selectedHotel.menu).length > 0 ? (
+              <div className="menu-grid">
+                {Object.entries(selectedHotel.menu).map(([menuId, item]) => (
+                  <div key={menuId} className="menu-item">
+                    <img src={item.imageUrl} alt={item.name} className="menu-img" />
+                    <h4>{item.name}</h4>
+                    <p>₹{item.price}</p>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <p>No menu items available.</p>
             )}
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
-export default Members;
+export default Hotels;

@@ -113,12 +113,12 @@ const MemberDashboard = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="dashboard">
       <div className={`sidebar ${isSidebarOpen ? "" : "closed"}`}>
         <div className="sidebar-header">
-          <h1>Member Dashboard</h1>
+          <h1>Members</h1>
           <button className="toggle-button" onClick={toggleSidebar}>
             <FaTimes />
           </button>
@@ -156,7 +156,7 @@ const MemberDashboard = () => {
 
                             {user && (
     <button className="member-button" onClick={() => navigate('/')}>
-  Member Dashboard
+  Main Dashboard
 </button>
 
             

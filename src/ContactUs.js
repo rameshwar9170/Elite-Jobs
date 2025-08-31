@@ -2,11 +2,11 @@ import React from 'react';
 
 const ContactUs = () => {
   const contactInfo = {
-    lastUpdated: "24-06-2024 15:35:09",
-    legalName: "RAMESHWAR NARAYAN SHINDE",
-    address: "New Osman pura, Aurangabad, Maharashtra, PIN: 431005",
-    phone: "9370329233",
-    email: "ramshinde9370@gmail.com",
+    lastUpdated: "31-08-2025 22:06:04",
+    legalName: "VIJAY GANGADHAR WARADE",
+    address: "Flat no 29, Nalni kh, Bhokardan, Jalna, Jalna, Maharashtra, PIN: 431114",
+    phone: "9823715910",
+    email: "bhagyshrivarade9@gmail.com",
   };
 
   return (

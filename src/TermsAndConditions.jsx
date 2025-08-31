@@ -7,7 +7,7 @@ const TermsAndConditions = () => {
       <p style={styles.updated}>Last updated on 24-06-2024 15:38:11</p>
 
       <p>These Terms and Conditions, along with the privacy policy or other terms (“Terms”) constitute a binding
-        agreement by and between <strong>RAMESHWAR NARAYAN SHINDE</strong>, (“Website Owner” or “we” or “us”
+        agreement by and between <strong>VIJAY GANGADHAR WARADE</strong>, (“Website Owner” or “we” or “us”
         or “our”) and you (“you” or “your”) and relate to your use of our website, goods (as applicable), or
         services (as applicable) (collectively, “Services”).</p>
 
@@ -52,7 +52,7 @@ const TermsAndConditions = () => {
         <li>These Terms and any dispute or claim relating to it, or its enforceability, shall be governed by and
           construed in accordance with the laws of India.</li>
         <li>All disputes arising out of or in connection with these Terms shall be subject to the exclusive
-          jurisdiction of the courts in Aurangabad, Maharashtra.</li>
+          jurisdiction of the courts in Jalna, Maharashtra.</li>
         <li>All concerns or communications relating to these Terms must be communicated to us using the contact
           information provided on this website.</li>
       </ul>

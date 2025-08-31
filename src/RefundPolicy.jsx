@@ -4,10 +4,10 @@ const RefundPolicy = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Cancellation & Refund Policy</h2>
-      <p style={styles.updated}>Last updated on 25-06-2025 22:46:09</p>
+      <p style={styles.updated}>Last updated on 31-08-2025 22:06:04</p>
 
       <p>
-        <strong>RAMESHWAR NARAYAN SHINDE</strong> believes in helping its customers as far as possible, and has
+        <strong>VIJAY GANGADHAR WARADE</strong> believes in helping its customers as far as possible, and has
         therefore a liberal cancellation policy. Under this policy:
       </p>
 
@@ -18,7 +18,7 @@ const RefundPolicy = () => {
           vendors/merchants and they have initiated the process of shipping them.
         </li>
         <li>
-          <strong>RAMESHWAR NARAYAN SHINDE</strong> does not accept cancellation requests for perishable items
+          <strong>VIJAY GANGADHAR WARADE</strong> does not accept cancellation requests for perishable items
           like flowers, eatables etc. However, refund/replacement can be made if the customer establishes that
           the quality of the product delivered is not good.
         </li>
@@ -38,7 +38,7 @@ const RefundPolicy = () => {
           the issue to them.
         </li>
         <li>
-          In case of any refunds approved by <strong>RAMESHWAR NARAYAN SHINDE</strong>, it’ll take
+          In case of any refunds approved by <strong>VIJAY GANGADHAR WARADE</strong>, it’ll take
           <strong> 9–15 days</strong> for the refund to be processed to the end customer.
         </li>
       </ul>

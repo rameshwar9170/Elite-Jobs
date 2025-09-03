@@ -31,6 +31,7 @@ import MemberSub from './MemberSub'; // Import MemberSub component
 import Members from './Members.js';
 import HotelPlans from './HotelPlans'; // Import HotelPlans component
 import ReferralDashboard from './ReferralDashboard'; // Import HotelPlans component
+import AllMembers from './AllMembers.js';
 
 const MemberDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -89,20 +90,12 @@ const MemberDashboard = () => {
   };
 
  const menuItems = [
-//   { name: 'Jobs', icon: <FaBriefcase />, component: Jobs },                        // Briefcase for jobs
-//   { name: 'Seekers', icon: <FaUser />, component: Seekers },                      // User for job seekers
-//   { name: 'Providers', icon: <FaBuilding />, component: Providers },            // Trash for delete
-//   { name: 'Add Providers', icon: <FaUserEdit />, component: AddProviders },       // User edit for adding provider
-//   { name: 'Add Seeker', icon: <FaUserEdit />, component: AddSeeker },             // User edit for adding seeker
-//   { name: 'Subscriptions', icon: <FaMoneyCheckAlt />, component: Subscriptions }, 
-//   { name: "Notifications", icon: <FaUserPlus />, component: Notifications }, // User plus for notifications
-//   // { name: 'Download', icon: <FaDownload />, component: Download },                // Download icon
-//   // { name: 'Delete Account', icon: <FaTrash />, component: DeleteAccount },  // Money/check for subscriptions
-//   { name: 'Manage Subscriptions', icon: <FaMoneyCheckAlt />, component: ManageSubscriptions }, // Money/check for manage subscriptions
+
       { name: 'Manage Members', icon: <FaMoneyCheckAlt />, component: Members }, // Money/check for manage subscriptions
     { name: 'Members Subscriptions', icon: <FaMoneyCheckAlt />, component: MemberSub },
         { name: 'Hotel Plans', icon: <FaMoneyCheckAlt />, component: HotelPlans },
         { name: 'Referrals', icon: <FaMoneyCheckAlt />, component: ReferralDashboard },
+        { name: 'all-members', icon: <FaMoneyCheckAlt />, component: AllMembers },
 ];
   const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
 

@@ -44,8 +44,14 @@ const MemberSub = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-     const planRef = ref(db, 'subscriptionPlans/EliteMembersPlan'); // ✅ save to the same path
-     await update(planRef, plan);
+      const planRef = ref(db, 'subscriptionPlans/EliteMembersPlan');
+      await update(planRef, plan);
+      
+      // New status logic
+      const statusRef = ref(db, 'EliteJobs/MemberPlan/status');
+      const statusValue = plan.price === 0 ? false : true;
+      await update(statusRef, { status: statusValue });
+      
       setMessage('✅ Plan updated successfully.');
     } catch (error) {
       console.error('Error updating plan:', error);

@@ -35,6 +35,14 @@ const Seekers = ({ onSeekerClick }) => {
     return date.toLocaleString(); // Shows both date and time
   };
 
+  // Fix for skills formatting
+  const formatSkills = (skills) => {
+    if (!skills) return 'N/A';
+    if (Array.isArray(skills)) return skills.join(', ');
+    if (typeof skills === 'string') return skills;
+    return 'N/A';
+  };
+
   return (
     <div className="seekers-container">
       {error && <p className="seekers-error">{error}</p>}
@@ -51,25 +59,29 @@ const Seekers = ({ onSeekerClick }) => {
                 <th>Experience</th>
                 <th>Skills</th>
                 <th>Resume</th>
-                <th>Last Active</th> {/* ✅ new column */}
+                <th>Last Active</th>
               </tr>
             </thead>
             <tbody>
               {seekers.map((seeker) => (
                 <tr key={seeker.id} className="clickable-row" onClick={() => onSeekerClick(seeker.id)}>
-                  <td>{seeker.name}</td>
-                  <td>{seeker.email}</td>
-                  <td>{seeker.phone}</td>
-                  <td>{seeker.district}</td>
-                  <td>{seeker.designation}</td>
-                  <td>{seeker.experience}</td>
-                  <td>{seeker.skills?.join(', ')}</td>
+                  <td>{seeker.name || 'N/A'}</td>
+                  <td>{seeker.email || 'N/A'}</td>
+                  <td>{seeker.phone || 'N/A'}</td>
+                  <td>{seeker.district || 'N/A'}</td>
+                  <td>{seeker.designation || 'N/A'}</td>
+                  <td>{seeker.experience || 'N/A'}</td>
+                  <td>{formatSkills(seeker.skills)}</td>
                   <td>
-                    <a href={seeker.resumeUrl} target="_blank" rel="noopener noreferrer">
-                      View
-                    </a>
+                    {seeker.resumeUrl ? (
+                      <a href={seeker.resumeUrl} target="_blank" rel="noopener noreferrer">
+                        View
+                      </a>
+                    ) : (
+                      'No Resume'
+                    )}
                   </td>
-                  <td>{formatTimestamp(seeker.lastActive)}</td> {/* ✅ formatted */}
+                  <td>{formatTimestamp(seeker.lastActive)}</td>
                 </tr>
               ))}
             </tbody>

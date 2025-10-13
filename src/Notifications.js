@@ -27,6 +27,7 @@ const Notifications = () => {
             topic, // "Provider" or "Seeker"
             title,
             body,
+            senderId: "XWyMfbA83aUoeC4cKMdtzFNj4Y12", // Add senderId as required by the API
           }),
         }
       );

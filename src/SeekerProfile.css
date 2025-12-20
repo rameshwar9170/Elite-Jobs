@@ -1,0 +1,208 @@
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.profile-back-button {
+  background-color: #0f1e40;
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.profile-back-button:hover {
+  background-color: #12274d;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(15, 30, 64, 0.1);
+}
+
+.profile-pic {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #0f1e40;
+  margin-bottom: 1rem;
+}
+
+.profile-name {
+  color: #0f1e40;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.profile-info {
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.profile-info p {
+  margin-bottom: 0.5rem;
+}
+
+.profile-info a {
+  color: #e63946;
+  text-decoration: none;
+}
+
+.profile-info a:hover {
+  text-decoration: underline;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.edit-button,
+.delete-button,
+.cancel-button,
+.update-button {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button,
+.update-button {
+  background-color: #0f1e40;
+  color: white;
+}
+
+.edit-button:hover,
+.update-button:hover {
+  background-color: #12274d;
+}
+
+.delete-button {
+  background-color: #e63946;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #d62828;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.profile-error,
+.profile-loading {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+  color: #e63946;
+}
+
+/* Form Styling */
+.profile-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #0f1e40;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-card {
+    padding: 1rem;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-info {
+    font-size: 0.95rem;
+  }
+
+  .edit-button,
+  .delete-button,
+  .cancel-button,
+  .update-button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    width: 100%;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.95rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-name {
+    font-size: 1.3rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 0.9rem;
+  }
+
+  .profile-info {
+    font-size: 0.9rem;
+  }
+
+  .profile-back-button {
+    width: 100%;
+    text-align: center;
+  }
+}

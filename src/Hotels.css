@@ -1,0 +1,152 @@
+/* Global Structure */
+.hotels-container {
+  padding: 30px;
+  background: #f0f4f8;
+  min-height: 100vh;
+}
+
+.hotels-title {
+  text-align: center;
+  color: #1e293b;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+/* Grid Display */
+.hotels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.hotel-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.hotel-card:hover {
+  transform: translateY(-4px);
+  background-color: #e0f2fe;
+}
+
+/* Hotel Card Content */
+.hotel-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.hotel-name {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.hotel-rating,
+.hotel-address {
+  margin: 5px 0;
+  color: #475569;
+}
+
+/* Popup Modal */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+.popup-content {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+}
+
+.popup-address {
+  margin-bottom: 20px;
+  color: #334155;
+}
+
+/* Menu Grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.menu-item {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.menu-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.menu-item h4 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+  color: #1e293b;
+}
+
+.menu-item p {
+  margin: 0;
+  color: #475569;
+}
+
+/* Loading and Errors */
+.loading {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1.2rem;
+  color: #334155;
+}
+
+.error-message {
+  text-align: center;
+  color: red;
+  font-weight: 500;
+  margin-top: 20px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}

@@ -1,0 +1,60 @@
+.notification-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.notification-heading {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.notification-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.notification-input,
+.notification-textarea,
+.notification-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.notification-textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.notification-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.notification-button:hover {
+  background-color: #0056b3;
+}
+
+.notification-button:disabled {
+  background-color: #999999;
+  cursor: not-allowed;
+}

@@ -1,0 +1,34 @@
+.add-job-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.add-job-form .form-group {
+  margin-bottom: 16px;
+}
+
+.add-job-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.add-job-form input,
+.add-job-form select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.add-job-form button {
+  padding: 10px 20px;
+  background-color: #66bb6a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

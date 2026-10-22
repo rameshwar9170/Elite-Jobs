@@ -1,38 +1,50 @@
 /* Global Structure */
 .hotels-container {
-  padding: 30px;
-  background: #f0f4f8;
-  min-height: 100vh;
+  padding: 0;
+  background: transparent;
+  min-height: auto;
+  animation: appFadeIn 0.3s ease-out;
 }
 
 .hotels-title {
   text-align: center;
-  color: #1e293b;
-  font-size: 2rem;
-  margin-bottom: 30px;
+  color: var(--text-main);
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
 }
 
 /* Grid Display */
 .hotels-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .hotels-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
 }
 
 .hotel-card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  padding: 1.25rem;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .hotel-card:hover {
-  transform: translateY(-4px);
-  background-color: #e0f2fe;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
 }
+
 
 /* Hotel Card Content */
 .hotel-logo {

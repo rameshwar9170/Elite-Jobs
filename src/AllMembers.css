@@ -60,7 +60,8 @@
   z-index: 10;
 }
 
-.edit-btn, .delete-btn {
+.all-members-container .action-buttons .edit-btn,
+.all-members-container .action-buttons .delete-btn {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e5e7eb;
   font-size: 1.1rem;
@@ -76,21 +77,22 @@
   backdrop-filter: blur(8px);
 }
 
-.edit-btn:hover {
+.all-members-container .action-buttons .edit-btn:hover {
   background-color: #3b82f6;
   color: white;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
-.delete-btn:hover {
+.all-members-container .action-buttons .delete-btn:hover {
   background-color: #ef4444;
   color: white;
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
-.edit-btn:disabled, .delete-btn:disabled {
+.all-members-container .action-buttons .edit-btn:disabled,
+.all-members-container .action-buttons .delete-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
@@ -538,7 +540,8 @@
     right: 12px;
   }
   
-  .edit-btn, .delete-btn {
+  .all-members-container .action-buttons .edit-btn,
+  .all-members-container .action-buttons .delete-btn {
     width: 32px;
     height: 32px;
     font-size: 0.9rem;
@@ -577,8 +580,6 @@
 }
 
 /* Perfect focus states for accessibility */
-.edit-btn:focus,
-.delete-btn:focus,
 .save-btn:focus,
 .cancel-btn:focus,
 .confirm-delete-btn:focus,

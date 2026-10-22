@@ -3,7 +3,6 @@ import { ref, get } from 'firebase/database';
 import { db } from './firebase';
 
 const ReferralDashboard = () => {
-  const [users, setUsers] = useState({});
   const [referralPairs, setReferralPairs] = useState([]);
   const [selectedReferrer, setSelectedReferrer] = useState(null);
   const [popupUsers, setPopupUsers] = useState([]);
@@ -16,7 +15,6 @@ const ReferralDashboard = () => {
         const snapshot = await get(usersRef);
         if (snapshot.exists()) {
           const allUsers = snapshot.val();
-          setUsers(allUsers);
 
           const referrers = Object.entries(allUsers).filter(
             ([_, user]) => user.referralCode

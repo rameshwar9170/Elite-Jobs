@@ -1,43 +1,88 @@
 import React, { useEffect, useState } from 'react';
-import { ref, get } from 'firebase/database';
+import { ref, get, update } from 'firebase/database';
 import { db } from './firebase';
-import './Jobs.css'; // Reusing job card styles
+import {
+  FaSearch,
+  FaEdit,
+  FaTrashAlt,
+  FaTimes,
+  FaSave,
+  FaUserCheck,
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaFilter
+} from 'react-icons/fa';
+import './Subscriptions.css';
 
 const Subscriptions = () => {
   const [users, setUsers] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dialogUser, setDialogUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     role: 'All',
     status: 'All',
     type: 'All',
   });
 
+  // Edit Subscription Modal State
+  const [editingUser, setEditingUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    subscriptionType: 'None',
+    subscriptionPrice: 0,
+    subscriptionDuration: '',
+    expiryDate: '',
+    subscriptionStatus: 'Active'
+  });
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const snapshot = await get(ref(db, 'EliteJobs/users'));
-        const usersData = snapshot.val() || {};
-        const allUsers = Object.values(usersData);
-        setUsers(allUsers);
-        setFiltered(allUsers);
-      } catch (err) {
-        console.error('Error fetching users:', err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const snapshot = await get(ref(db, 'EliteJobs/users'));
+      const usersData = snapshot.val() || {};
+      const allUsers = Object.entries(usersData).map(([id, user]) => ({
+        id,
+        ...user,
+      }));
+      setUsers(allUsers);
+      setFiltered(allUsers);
+    } catch (err) {
+      console.error('Error fetching users:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const result = users.filter((u) => {
-      const matchesRole = filters.role === 'All' || u.role === filters.role.toLowerCase();
+      const name = (u.name || u.companyName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const phone = (u.phone || '').toLowerCase();
+      const district = (u.district || '').toLowerCase();
+      const q = searchTerm.toLowerCase();
+
+      const matchesSearch =
+        !searchTerm ||
+        name.includes(q) ||
+        email.includes(q) ||
+        phone.includes(q) ||
+        district.includes(q);
+
+      if (!matchesSearch) return false;
+
+      const matchesRole =
+        filters.role === 'All' || (u.role || '').toLowerCase() === filters.role.toLowerCase();
+
+      const hasActiveSub = u.subscriptionType && u.subscriptionType !== 'None';
       const matchesStatus =
         filters.status === 'All' ||
-        (filters.status === 'Active' && u.subscriptionType && u.subscriptionType !== 'None') ||
-        (filters.status === 'Inactive' && (!u.subscriptionType || u.subscriptionType === 'None'));
+        (filters.status === 'Active' && hasActiveSub) ||
+        (filters.status === 'Inactive' && !hasActiveSub);
+
       const matchesType =
         filters.type === 'All' || (u.subscriptionType || 'None') === filters.type;
 
@@ -45,103 +90,335 @@ const Subscriptions = () => {
     });
 
     setFiltered(result);
-  }, [filters, users]);
+  }, [filters, users, searchTerm]);
 
-  if (loading) return <div className="jobs-container">Loading...</div>;
+  // Open Edit Modal
+  const handleOpenEdit = (user) => {
+    setEditingUser(user);
+    setEditFormData({
+      subscriptionType: user.subscriptionType || 'None',
+      subscriptionPrice: user.subscriptionPrice || 0,
+      subscriptionDuration: user.subscriptionDuration || '1 Month',
+      expiryDate: user.expiryDate ? new Date(user.expiryDate).toISOString().split('T')[0] : '',
+      subscriptionStatus: user.subscriptionStatus || (user.subscriptionType && user.subscriptionType !== 'None' ? 'Active' : 'Inactive')
+    });
+  };
+
+  // Save Edit
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setSaving(true);
+    try {
+      const updatedFields = {
+        subscriptionType: editFormData.subscriptionType,
+        subscriptionPrice: Number(editFormData.subscriptionPrice) || 0,
+        subscriptionDuration: editFormData.subscriptionDuration,
+        expiryDate: editFormData.expiryDate ? new Date(editFormData.expiryDate).toISOString() : null,
+        subscriptionStatus: editFormData.subscriptionStatus,
+        lastUpdated: new Date().toISOString()
+      };
+
+      await update(ref(db, `EliteJobs/users/${editingUser.id}`), updatedFields);
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === editingUser.id ? { ...u, ...updatedFields } : u))
+      );
+      setEditingUser(null);
+    } catch (err) {
+      alert('Error updating subscription: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Delete / Remove Subscription
+  const handleDelete = async (user) => {
+    const displayName = user.name || user.companyName || 'this user';
+    if (window.confirm(`Are you sure you want to cancel and remove the subscription for "${displayName}"?`)) {
+      try {
+        const clearedFields = {
+          subscriptionType: 'None',
+          subscriptionPrice: 0,
+          subscriptionDuration: '',
+          expiryDate: null,
+          subscriptionStatus: 'Inactive'
+        };
+        await update(ref(db, `EliteJobs/users/${user.id}`), clearedFields);
+        setUsers((prev) =>
+          prev.map((u) => (u.id === user.id ? { ...u, ...clearedFields } : u))
+        );
+      } catch (err) {
+        alert('Failed to delete subscription: ' + err.message);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="table-responsive-container" style={{ padding: '3rem', textAlign: 'center' }}>
+        <p>Loading subscriptions data...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="jobs-container">
-      <div className="subs-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 className="jobs-title">User Subscriptions</h2>
+    <div className="subscriptions-page animate-fade-in">
+      {/* Header with Search and Filters */}
+      <div className="subs-controls-header">
+        <div className="seekers-search-box">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search by name, email, phone, district..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          {searchTerm && (
+            <button className="clear-btn" onClick={() => setSearchTerm('')}>
+              ✕
+            </button>
+          )}
+        </div>
 
-        <div className="subs-filters" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div className="form-group">
-            <label>Role</label>
-            <select onChange={(e) => setFilters({ ...filters, role: e.target.value })}>
-              <option>All</option>
-              <option>Seeker</option>
-              <option>Provider</option>
+        <div className="subs-filters-bar">
+          <div className="filter-select-group">
+            <label><FaFilter /> Role</label>
+            <select
+              value={filters.role}
+              onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+            >
+              <option value="All">All Roles</option>
+              <option value="Seeker">Seeker</option>
+              <option value="Provider">Provider</option>
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="filter-select-group">
             <label>Status</label>
-            <select onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
-              <option>All</option>
-              <option>Active</option>
-              <option>Inactive</option>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            >
+              <option value="All">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
           </div>
 
-          <div className="form-group">
-            <label>Subscription Type</label>
-            <select onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
-              <option>All</option>
-              <option>None</option>
-              <option>Basic</option>
-              <option>Premium</option>
+          <div className="filter-select-group">
+            <label>Plan Type</label>
+            <select
+              value={filters.type}
+              onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+            >
+              <option value="All">All Plans</option>
+              <option value="None">None</option>
+              <option value="Basic">Basic</option>
+              <option value="Premium">Premium</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className="jobs-grid">
-        {filtered.map((user, index) => (
-          <div key={index} className="job-card" onClick={() => setDialogUser(user)}>
-            <div className="job-header">
-              <h4>{user.name || 'Unnamed'}</h4>
-              <p>{user.email}</p>
+      {filtered.length === 0 ? (
+        <div className="seekers-empty-card">
+          <h3>No Subscriptions Found</h3>
+          <p>No records match the current filter or search criteria.</p>
+        </div>
+      ) : (
+        /* Native Responsive Table */
+        <div className="table-responsive-container">
+          <table className="modern-data-table">
+            <thead>
+              <tr>
+                <th>User / Organization</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>District</th>
+                <th>Subscription Plan</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((user) => {
+                const displayName = user.name || user.companyName || 'Unnamed';
+                const hasActive = user.subscriptionType && user.subscriptionType !== 'None';
+                return (
+                  <tr key={user.id} className="table-row-hover">
+                    <td>
+                      <div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>
+                          {displayName}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {user.email || 'No email'}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`badge-role ${user.role === 'provider' ? 'role-provider' : 'role-seeker'}`}>
+                        {user.role || 'user'}
+                      </span>
+                    </td>
+                    <td>{user.phone || '-'}</td>
+                    <td>{user.district || '-'}</td>
+                    <td>
+                      <span className={`status-pill ${
+                        user.subscriptionType === 'Premium'
+                          ? 'status-open'
+                          : user.subscriptionType === 'Basic'
+                          ? 'status-pending'
+                          : 'status-default'
+                      }`}>
+                        {user.subscriptionType || 'None'}
+                      </span>
+                    </td>
+                    <td>
+                      {user.subscriptionPrice ? `₹${user.subscriptionPrice}` : '₹0'}
+                    </td>
+                    <td>{user.subscriptionDuration || '-'}</td>
+                    <td>
+                      {user.expiryDate ? (
+                        new Date(user.expiryDate).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })
+                      ) : (
+                        <span className="text-muted-sm">-</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`status-pill ${hasActive ? 'status-open' : 'status-closed'}`}>
+                        {hasActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="table-action-btns">
+                        <button
+                          className="table-action-btn edit-btn"
+                          onClick={() => handleOpenEdit(user)}
+                          title="Edit Subscription"
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="table-action-btn delete-btn"
+                          onClick={() => handleDelete(user)}
+                          title="Delete / Cancel Subscription"
+                        >
+                          <FaTrashAlt /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Edit Subscription Modal Dialog */}
+      {editingUser && (
+        <div className="modal-backdrop-overlay" onClick={() => setEditingUser(null)}>
+          <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><FaEdit style={{ color: '#2563eb', marginRight: '8px' }} /> Edit User Subscription</h3>
+              <button className="modal-close-icon" onClick={() => setEditingUser(null)}>
+                <FaTimes />
+              </button>
             </div>
 
-            <div className="job-body">
-              <p><strong>Phone:</strong> {user.phone}</p>
-              <p><strong>Role:</strong> {user.role}</p>
-              <p><strong>District:</strong> {user.district || 'N/A'}</p>
-              <p><strong>Subscription:</strong> {user.subscriptionType || 'None'}</p>
-              <p><strong>Expiry:</strong> {user.expiryDate ? new Date(user.expiryDate).toLocaleDateString() : 'N/A'}</p>
-            </div>
+            <form onSubmit={handleSaveEdit} className="modal-form">
+              <div className="modal-form-grid">
+                <div className="form-field-group full-width">
+                  <label><FaUserCheck /> User: {editingUser.name || editingUser.companyName}</label>
+                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                    Email: {editingUser.email} | Role: {editingUser.role}
+                  </span>
+                </div>
 
-            <div className="job-footer">
-              <span className={`job-status ${
-                user.subscriptionType === 'Premium'
-                  ? 'status-open'
-                  : user.subscriptionType === 'Basic'
-                  ? 'status-pending'
-                  : 'status-default'
-              }`}>
-                {user.subscriptionType || 'None'}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+                <div className="form-field-group">
+                  <label>Subscription Plan</label>
+                  <select
+                    value={editFormData.subscriptionType}
+                    onChange={(e) => setEditFormData({ ...editFormData, subscriptionType: e.target.value })}
+                  >
+                    <option value="None">None</option>
+                    <option value="Basic">Basic</option>
+                    <option value="Premium">Premium</option>
+                  </select>
+                </div>
 
-      {/* Dialog */}
-      {dialogUser && (
-        <div className="subs-dialog-backdrop" onClick={() => setDialogUser(null)}>
-          <div className="subs-dialog" onClick={(e) => e.stopPropagation()}>
-            <h3>{dialogUser.name}</h3>
-            <p><strong>Email:</strong> {dialogUser.email}</p>
-            <p><strong>Phone:</strong> {dialogUser.phone}</p>
-            <p><strong>District:</strong> {dialogUser.district}</p>
-            <p><strong>Role:</strong> {dialogUser.role}</p>
-            <p><strong>Subscription Type:</strong> {dialogUser.subscriptionType || 'None'}</p>
-            <p><strong>Duration:</strong> {dialogUser.subscriptionDuration || 'N/A'}</p>
-            <p><strong>Price:</strong> ₹{dialogUser.subscriptionPrice || '0'}</p>
-            <p><strong>Expiry Date:</strong> {dialogUser.expiryDate ? new Date(dialogUser.expiryDate).toLocaleDateString() : 'N/A'}</p>
-            <p><strong>Payment ID:</strong> {dialogUser.paymentId || 'N/A'}</p>
+                <div className="form-field-group">
+                  <label><FaMoneyBillWave /> Price (₹)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.subscriptionPrice}
+                    onChange={(e) => setEditFormData({ ...editFormData, subscriptionPrice: e.target.value })}
+                  />
+                </div>
 
-            {dialogUser.role === 'provider' && (
-              <>
-                <hr />
-                <p><strong>Company:</strong> {dialogUser.companyName || 'N/A'}</p>
-                <p><strong>Contact Person:</strong> {dialogUser.contactPerson || 'N/A'}</p>
-                <p><strong>Industry:</strong> {dialogUser.industry || 'N/A'}</p>
-                <p><strong>Location:</strong> {dialogUser.location || 'N/A'}</p>
-              </>
-            )}
+                <div className="form-field-group">
+                  <label>Duration</label>
+                  <select
+                    value={editFormData.subscriptionDuration}
+                    onChange={(e) => setEditFormData({ ...editFormData, subscriptionDuration: e.target.value })}
+                  >
+                    <option value="1 Month">1 Month</option>
+                    <option value="3 Months">3 Months</option>
+                    <option value="6 Months">6 Months</option>
+                    <option value="1 Year">1 Year</option>
+                  </select>
+                </div>
 
-            <button className="close-btn" onClick={() => setDialogUser(null)}>Close</button>
+                <div className="form-field-group">
+                  <label><FaCalendarAlt /> Expiry Date</label>
+                  <input
+                    type="date"
+                    value={editFormData.expiryDate}
+                    onChange={(e) => setEditFormData({ ...editFormData, expiryDate: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-field-group">
+                  <label>Status</label>
+                  <select
+                    value={editFormData.subscriptionStatus}
+                    onChange={(e) => setEditFormData({ ...editFormData, subscriptionStatus: e.target.value })}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="modal-footer-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setEditingUser(null)}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? 'Saving...' : <><FaSave /> Save Subscription</>}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

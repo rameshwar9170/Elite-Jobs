@@ -2,53 +2,48 @@ import React, { useState, useEffect } from 'react';
 import {
   FaBars,
   FaTimes,
-  FaBriefcase,
-  FaUser,
-  FaBuilding,
-  FaTrash,
   FaMoneyCheckAlt,
-  FaUserEdit,
-  FaUserPlus,
-  FaDownload,
+  FaSignOutAlt,
+  FaChevronRight,
+  FaHotel,
+  FaUsers,
+  FaShareAlt,
+  FaArrowLeft,
+  FaEllipsisH,
+  FaThLarge
 } from 'react-icons/fa';
 import { auth } from './firebase';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import Seekers from './Seekers';
-import Providers from './Providers';
-import Jobs from './Jobs';
-import Download from './Download';
-import DeleteAccount from './DeleteAccount';
-import SeekerProfile from './SeekerProfile';
-import ProviderProfile from './ProviderProfile';
+import Members from './Members';
+import MemberSub from './MemberSub';
+import HotelPlans from './HotelPlans';
+import ReferralDashboard from './ReferralDashboard';
+import AllMembers from './AllMembers';
 import './Dashboard.css';
-import AddProviders from './AddProviders';
-import AddSeeker from './AddSeeker';
-import Subscriptions from './Subscriptions';
-import Notifications from './Notifications';
-import ManageSubscriptions from './ManageSubscriptions.js'; // Import ManageSubscriptions component
-import MemberSub from './MemberSub'; // Import MemberSub component
-import Members from './Members.js';
-import HotelPlans from './HotelPlans'; // Import HotelPlans component
-import ReferralDashboard from './ReferralDashboard'; // Import HotelPlans component
-import AllMembers from './AllMembers.js';
 
 const MemberDashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('Seekers');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('Manage Members');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSeekerId, setSelectedSeekerId] = useState(null);
-  const [selectedProviderId, setSelectedProviderId] = useState(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) {
+      setIsSidebarOpen(true);
+    } else {
+      setIsSidebarOpen(false);
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       (user) => {
         setUser(user);
-        if (!user && activeTab !== 'Download') {
+        if (!user) {
           navigate('/login');
         }
         setLoading(false);
@@ -56,132 +51,205 @@ const MemberDashboard = () => {
       (error) => {
         console.error('Auth error:', error);
         setLoading(false);
-        if (activeTab !== 'Download') {
-          navigate('/login');
-        }
+        navigate('/login');
       }
     );
     return () => unsubscribe();
-  }, [navigate, activeTab]);
+  }, [navigate]);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
 
   const handleLogout = () => {
-    signOut(auth)
-      .then(() => navigate('/login'))
-      .catch((error) => console.error('Logout error:', error));
+    if (window.confirm('Are you sure you want to log out?')) {
+      signOut(auth)
+        .then(() => navigate('/login'))
+        .catch((error) => console.error('Logout error:', error));
+    }
   };
 
-  const handleSeekerClick = (id) => {
-    setSelectedSeekerId(id);
+  const handleTabSelect = (name) => {
+    setActiveTab(name);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
   };
 
-  const handleProviderClick = (id) => {
-    setSelectedProviderId(id);
-  };
+  const menuItems = [
+    { name: 'Manage Members', label: 'Members', icon: <FaUsers />, component: Members },
+    { name: 'Members Subscriptions', label: 'Billing', icon: <FaMoneyCheckAlt />, component: MemberSub },
+    { name: 'Hotel Plans', label: 'Hotels', icon: <FaHotel />, component: HotelPlans },
+    { name: 'Referrals', label: 'Referrals', icon: <FaShareAlt />, component: ReferralDashboard },
+    { name: 'All Members', label: 'Directory', icon: <FaThLarge />, component: AllMembers },
+  ];
 
-  const handleBackToList = () => {
-    setSelectedSeekerId(null);
-    setSelectedProviderId(null);
-  };
-
-  const handleAddJobClick = (providerId) => {
-    navigate(`/add-job/${providerId}`);
-  };
-
- const menuItems = [
-
-      { name: 'Manage Members', icon: <FaMoneyCheckAlt />, component: Members }, // Money/check for manage subscriptions
-    { name: 'Members Subscriptions', icon: <FaMoneyCheckAlt />, component: MemberSub },
-        { name: 'Hotel Plans', icon: <FaMoneyCheckAlt />, component: HotelPlans },
-        { name: 'Referrals', icon: <FaMoneyCheckAlt />, component: ReferralDashboard },
-        { name: 'all-members', icon: <FaMoneyCheckAlt />, component: AllMembers },
-];
-  const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component;
+  const ActiveComponent = menuItems.find((item) => item.name === activeTab)?.component || Members;
 
   if (loading) {
     return (
-      <div className="loading-screen">
-        <div>Loading...</div>
+      <div className="app-mobile-loading">
+        <div className="app-loading-brand">
+          <div className="brand-logo-icon">EJ</div>
+          <h2>Member Portal</h2>
+          <div className="app-spinner"></div>
+          <p>Loading member data...</p>
+        </div>
       </div>
     );
   }
-  
+
   return (
-    <div className="dashboard">
-      <div className={`sidebar ${isSidebarOpen ? "" : "closed"}`}>
-        <div className="sidebar-header">
-          <h1>Members</h1>
-          <button className="toggle-button" onClick={toggleSidebar}>
+    <div className="dashboard-shell">
+      {/* Mobile Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div className="mobile-backdrop-overlay" onClick={closeSidebar} />
+      )}
+
+      {/* Slide-out Sidebar */}
+      <aside className={`app-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+        <div className="sidebar-brand-box">
+          <div className="brand-badge-row">
+            <div className="brand-logo-icon">EJ</div>
+            <div>
+              <h1 className="brand-title">Member Portal</h1>
+              <span className="brand-sub">EliteJobs Club</span>
+            </div>
+          </div>
+          <button className="sidebar-close-btn" onClick={closeSidebar}>
             <FaTimes />
           </button>
         </div>
-        <nav className="sidebar-nav">
-          {menuItems.map((item) => (
+
+        {/* User Card */}
+        {user && (
+          <div className="sidebar-user-card">
+            <div className="user-avatar-circle">
+              {user.email ? user.email.slice(0, 2).toUpperCase() : 'AD'}
+            </div>
+            <div className="user-details">
+              <span className="user-email">{user.email || 'Admin'}</span>
+              <span className="user-status-pill">Member Manager</span>
+            </div>
+          </div>
+        )}
+
+        {/* Scrollable Navigation */}
+        <div className="sidebar-scrollable-menu">
+          <div className="menu-category-section">
+            <span className="menu-category-label">Member Features</span>
+            <div className="menu-items-group">
+              {menuItems.map((item) => (
+                <button
+                  key={item.name}
+                  className={`sidebar-nav-item ${activeTab === item.name ? 'active' : ''}`}
+                  onClick={() => handleTabSelect(item.name)}
+                >
+                  <span className="item-icon">{item.icon}</span>
+                  <span className="item-name">{item.name}</span>
+                  {activeTab === item.name && <span className="active-dot" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="menu-category-section">
+            <span className="menu-category-label">Switch Workspace</span>
             <button
-              key={item.name}
-              className={`nav-item ${activeTab === item.name ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab(item.name);
-                setSelectedSeekerId(null);
-                setSelectedProviderId(null);
-                if (window.innerWidth < 768) setIsSidebarOpen(false);
-              }}
+              className="sidebar-nav-item portal-item"
+              onClick={() => navigate('/')}
             >
-              <span className="nav-icon">{item.icon}</span>
-              <span>{item.name}</span>
+              <span className="item-icon">
+                <FaArrowLeft />
+              </span>
+              <span className="item-name">Main Dashboard</span>
+              <FaChevronRight className="item-arrow" />
             </button>
-          ))}
-        </nav>
-      </div>
+          </div>
+        </div>
 
-      <div className={`main-content ${isSidebarOpen ? "" : "full-width"}`}>
-        <header className="header">
-          <button className="menu-button" onClick={toggleSidebar}>
-            <FaBars />
+        <div className="sidebar-footer">
+          <button className="sidebar-logout-btn" onClick={handleLogout}>
+            <FaSignOutAlt />
+            <span>Sign Out</span>
           </button>
-          <h2>{activeTab}</h2>
-          {user && (
-            <button className="logout-button" onClick={handleLogout}>
-              Logout
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className={`app-main-viewport ${isSidebarOpen ? 'sidebar-expanded' : ''}`}>
+        <header className="app-topbar">
+          <div className="topbar-left">
+            <button className="topbar-menu-toggle" onClick={toggleSidebar}>
+              <FaBars />
             </button>
-          )}
+            <div className="topbar-screen-info">
+              <span className="screen-badge">Member Portal</span>
+              <h2 className="topbar-heading">{activeTab}</h2>
+            </div>
+          </div>
 
-                            {user && (
-    <button className="member-button" onClick={() => navigate('/')}>
-  Main Dashboard
-</button>
+          <div className="topbar-right">
+            <button
+              className="topbar-member-btn"
+              onClick={() => navigate('/')}
+              title="Return to Main Dashboard"
+            >
+              <FaArrowLeft className="btn-icon" />
+              <span className="btn-text">Main Portal</span>
+            </button>
 
-            
-          )}
-
+            {user && (
+              <button
+                className="topbar-user-badge"
+                onClick={handleLogout}
+                title="Click to Logout"
+              >
+                <div className="topbar-user-initials">
+                  {user.email ? user.email.slice(0, 2).toUpperCase() : 'M'}
+                </div>
+                <FaSignOutAlt className="logout-hint-icon" />
+              </button>
+            )}
+          </div>
         </header>
 
-        <main className="main-section">
-          {selectedSeekerId ? (
-            <SeekerProfile id={selectedSeekerId} onBack={handleBackToList} />
-          ) : selectedProviderId ? (
-            <ProviderProfile
-              id={selectedProviderId}
-              onBack={handleBackToList}
-            />
-          ) : activeTab === "Providers" ? (
-            <Providers
-              onProviderClick={handleProviderClick}
-              onAddJobClick={handleAddJobClick}
-            />
-          ) : ActiveComponent ? (
-            <ActiveComponent
-              onSeekerClick={handleSeekerClick}
-              onProviderClick={handleProviderClick}
-            />
-          ) : (
-            <p>Invalid Tab</p>
-          )}
+        <main className="app-content-body">
+          <div className="content-container">
+            <ActiveComponent />
+          </div>
         </main>
+
+        {/* Mobile Bottom Dock */}
+        <nav className="mobile-bottom-dock">
+          {menuItems.slice(0, 4).map((dock) => {
+            const isActive = activeTab === dock.name;
+            return (
+              <button
+                key={dock.name}
+                className={`dock-tab-btn ${isActive ? 'active' : ''}`}
+                onClick={() => handleTabSelect(dock.name)}
+              >
+                <span className="dock-icon">{dock.icon}</span>
+                <span className="dock-label">{dock.label}</span>
+                {isActive && <span className="dock-active-pill" />}
+              </button>
+            );
+          })}
+
+          <button
+            className={`dock-tab-btn ${isSidebarOpen ? 'active' : ''}`}
+            onClick={toggleSidebar}
+          >
+            <span className="dock-icon">
+              <FaEllipsisH />
+            </span>
+            <span className="dock-label">More</span>
+          </button>
+        </nav>
       </div>
     </div>
   );
 };
 
 export default MemberDashboard;
+

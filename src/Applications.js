@@ -1,425 +1,279 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref, get } from "firebase/database";
-import { useParams } from "react-router-dom"; // Assuming react-router-dom is used for routing
+import { getDatabase, ref, get, update, remove } from "firebase/database";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaEdit,
+  FaTrashAlt,
+  FaTimes,
+  FaSave,
+  FaFilePdf
+} from "react-icons/fa";
 
 const Applications = () => {
-  // Get providerId from the URL parameters
   const { id: providerId } = useParams();
-  // State to store the fetched applications
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
-  // State to manage the loading status
   const [loading, setLoading] = useState(true);
 
+  // Edit status modal state
+  const [editingApp, setEditingApp] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("Pending");
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
-    /**
-     * Fetches application data from Firebase Realtime Database.
-     * It filters applications by providerId and then fetches seeker details for each application.
-     */
-    const fetchApplications = async () => {
-      try {
-        // Initialize Firebase Database instance
-        const db = getDatabase();
-        // Fetch all applications from the 'applications' node
-        const appsSnap = await get(ref(db, 'applications'));
-        const appsData = appsSnap.val();
-        const filtered = [];
+    fetchApplications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [providerId]);
 
-        // Process fetched applications if data exists
-        if (appsData) {
-          // Iterate through each application
-          for (const appId in appsData) {
-            const app = appsData[appId];
+  const fetchApplications = async () => {
+    try {
+      const db = getDatabase();
+      const appsSnap = await get(ref(db, 'applications'));
+      const appsData = appsSnap.val();
+      const filtered = [];
 
-            // Check if the application belongs to the current provider
-            if (app.providerId === providerId) {
-              // Fetch the seeker details using seekerId from the 'EliteJobs/users' node
-              const seekerSnap = await get(ref(db, `EliteJobs/users/${app.seekerId}`));
-              // Get seeker data if it exists, otherwise an empty object
-              const seekerData = seekerSnap.exists() ? seekerSnap.val() : {};
+      if (appsData) {
+        for (const appId in appsData) {
+          const app = appsData[appId];
 
-              // Add the application with seeker information to the filtered list
-              filtered.push({
-                ...app,
-                seekerInfo: seekerData,
-              });
-            }
+          if (app.providerId === providerId) {
+            const seekerSnap = await get(ref(db, `EliteJobs/users/${app.seekerId}`));
+            const seekerData = seekerSnap.exists() ? seekerSnap.val() : {};
+
+            filtered.push({
+              id: appId,
+              ...app,
+              seekerInfo: seekerData,
+            });
           }
         }
-
-        // Update the applications state and set loading to false
-        setApplications(filtered);
-        setLoading(false);
-      } catch (error) {
-        // Log any errors during data fetching
-        console.error("Error fetching applications:", error);
-        // Set loading to false even if there's an error
-        setLoading(false);
       }
-    };
 
-    // Call the fetchApplications function when the component mounts or providerId changes
-    fetchApplications();
-  }, [providerId]); // Dependency array: re-run effect if providerId changes
+      setApplications(filtered);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+      setLoading(false);
+    }
+  };
 
-  // Display a loading spinner while data is being fetched
+  const handleOpenEdit = (app) => {
+    setEditingApp(app);
+    setSelectedStatus(app.status || "Pending");
+  };
+
+  const handleSaveStatus = async (e) => {
+    e.preventDefault();
+    if (!editingApp) return;
+    setSaving(true);
+    try {
+      const db = getDatabase();
+      await update(ref(db, `applications/${editingApp.id}`), {
+        status: selectedStatus,
+        lastUpdated: new Date().toISOString()
+      });
+
+      setApplications((prev) =>
+        prev.map((a) => (a.id === editingApp.id ? { ...a, status: selectedStatus } : a))
+      );
+      setEditingApp(null);
+    } catch (err) {
+      alert("Error updating application status: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (appId, seekerName) => {
+    if (window.confirm(`Are you sure you want to delete application from "${seekerName || 'this candidate'}"?`)) {
+      try {
+        const db = getDatabase();
+        await remove(ref(db, `applications/${appId}`));
+        setApplications((prev) => prev.filter((a) => a.id !== appId));
+      } catch (err) {
+        alert("Failed to delete application: " + err.message);
+      }
+    }
+  };
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-        <p className="loading-text">Loading applications...</p>
+      <div className="table-responsive-container" style={{ padding: '3rem', textAlign: 'center', margin: '2rem auto', maxWidth: '1000px' }}>
+        <p>Loading candidate applications...</p>
       </div>
     );
   }
 
-  // Render the applications table or a "No applications found" message
   return (
-    <div className="applications-container">
-      <h2>Applications for Your Posted Jobs</h2>
+    <div style={{ maxWidth: '1300px', margin: '20px auto', padding: '0 15px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 1rem',
+            borderRadius: '8px',
+            border: '1px solid #cbd5e1',
+            background: '#ffffff',
+            fontWeight: 600,
+            cursor: 'pointer'
+          }}
+        >
+          <FaArrowLeft /> Back to Providers
+        </button>
+
+        <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#0f172a' }}>
+          Job Applications Received ({applications.length})
+        </h2>
+      </div>
 
       {applications.length === 0 ? (
-        <p className="no-applications">No applications found.</p>
+        <div className="seekers-empty-card" style={{ background: '#fff', borderRadius: '12px', padding: '3rem', textAlign: 'center', border: '1px dashed #cbd5e1' }}>
+          <p style={{ color: '#64748b', fontSize: '1.05rem', margin: 0 }}>No applications found for this provider's posted jobs.</p>
+        </div>
       ) : (
-        <div className="table-wrapper">
-          <table className="applications-table">
+        <div className="table-responsive-container">
+          <table className="modern-data-table">
             <thead>
               <tr>
-                {/* <th>#</th> */}
                 <th>Job Title</th>
                 <th>Company</th>
                 <th>Status</th>
-                <th>Applied On</th>
-                <th>Seeker Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th>Applied Date</th>
+                <th>Candidate Name</th>
+                <th>Contact</th>
                 <th>District</th>
                 <th>Experience</th>
                 <th>Skills</th>
                 <th>Resume</th>
-                {/* <th>Profile</th> */}
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {applications.map((app, index) => (
-                <tr key={index} className="table-row">
-                  {/* <td>{index + 1}</td> */}
-                  <td>{app.jobTitle}</td>
-                  <td>{app.companyName}</td>
+              {applications.map((app) => (
+                <tr key={app.id} className="table-row-hover">
+                  <td style={{ fontWeight: 700 }}>{app.jobTitle || 'N/A'}</td>
+                  <td>{app.companyName || 'N/A'}</td>
                   <td>
-                    <span className={`status-badge status-${app.status?.toLowerCase()}`}>
-                      {app.status}
+                    <span className={`status-pill ${
+                      app.status === 'Accepted' || app.status === 'Shortlisted'
+                        ? 'status-open'
+                        : app.status === 'Rejected'
+                        ? 'status-closed'
+                        : 'status-pending'
+                    }`}>
+                      {app.status || 'Pending'}
                     </span>
                   </td>
-                  <td>{new Date(app.appliedDate).toLocaleString()}</td>
-                  <td>{app.seekerInfo?.name || 'N/A'}</td>
-                  <td>{app.seekerInfo?.email || 'N/A'}</td>
-                  <td>{app.seekerInfo?.phone || 'N/A'}</td>
-                  <td>{app.seekerInfo?.district || 'N/A'}</td>
-                  <td>{app.seekerInfo?.experience || 'N/A'}</td>
-                  <td>{app.seekerInfo?.skills || 'N/A'}</td>
+                  <td style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                    {app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : 'N/A'}
+                  </td>
+                  <td style={{ fontWeight: 600 }}>{app.seekerInfo?.name || 'N/A'}</td>
+                  <td>
+                    <div style={{ fontSize: '0.8rem' }}>{app.seekerInfo?.phone || '-'}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{app.seekerInfo?.email || '-'}</div>
+                  </td>
+                  <td>{app.seekerInfo?.district || '-'}</td>
+                  <td>{app.seekerInfo?.experience || 'Fresher'}</td>
+                  <td>
+                    <span style={{ fontSize: '0.8rem', maxWidth: '140px', display: 'inline-block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {app.seekerInfo?.skills || '-'}
+                    </span>
+                  </td>
                   <td>
                     {app.seekerInfo?.resumeUrl ? (
-                      <a href={app.seekerInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="resume-link">
-                        View
+                      <a
+                        href={app.seekerInfo.resumeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#2563eb', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                      >
+                        <FaFilePdf /> View
                       </a>
                     ) : (
-                      'N/A'
+                      <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>None</span>
                     )}
                   </td>
-                  {/* <td>
-                    {app.seekerInfo?.profilePicUrl ? (
-                      <img
-                        src={app.seekerInfo.profilePicUrl}
-                        alt="Profile"
-                        className="profile-img"
-                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/50x50/cccccc/333333?text=N/A'; }} // Fallback for broken images
-                      />
-                    ) : (
-                      'N/A'
-                    )}
-                  </td> */}
+                  <td>
+                    <div className="table-action-btns">
+                      <button
+                        className="table-action-btn edit-btn"
+                        onClick={() => handleOpenEdit(app)}
+                        title="Update Status"
+                      >
+                        <FaEdit /> Edit
+                      </button>
+                      <button
+                        className="table-action-btn delete-btn"
+                        onClick={() => handleDelete(app.id, app.seekerInfo?.name)}
+                        title="Delete Application"
+                      >
+                        <FaTrashAlt /> Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-      {/* CSS Styles for the component */}
-      <style jsx>{`
-        /* General Body and Container Styling */
-        body {
-          font-family: 'Inter', sans-serif;
-          background-color: #f0f2f5;
-          margin: 0;
-          padding: 0;
-          color: #333;
-        }
 
-        .applications-container {
-          max-width: 1200px;
-          margin: 40px auto;
-          padding: 30px;
-          background-color: #ffffff;
-          border-radius: 12px;
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-          animation: fadeIn 0.8s ease-out;
-        }
+      {/* Edit Status Modal */}
+      {editingApp && (
+        <div className="modal-backdrop-overlay" onClick={() => setEditingApp(null)}>
+          <div className="modal-content-card" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><FaEdit style={{ color: '#2563eb', marginRight: '8px' }} /> Update Application Status</h3>
+              <button className="modal-close-icon" onClick={() => setEditingApp(null)}>
+                <FaTimes />
+              </button>
+            </div>
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+            <form onSubmit={handleSaveStatus} className="modal-form">
+              <div style={{ fontSize: '0.9rem', color: '#475569' }}>
+                <p style={{ margin: '0 0 4px 0' }}><strong>Candidate:</strong> {editingApp.seekerInfo?.name || 'N/A'}</p>
+                <p style={{ margin: 0 }}><strong>Applied For:</strong> {editingApp.jobTitle}</p>
+              </div>
 
-        h2 {
-          text-align: center;
-          color: #2c3e50;
-          margin-bottom: 30px;
-          font-size: 2.2em;
-          font-weight: 700;
-          letter-spacing: -0.5px;
-        }
+              <div className="form-field-group">
+                <label>Application Status</label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Reviewed">Reviewed</option>
+                  <option value="Shortlisted">Shortlisted</option>
+                  <option value="Accepted">Accepted</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
 
-        /* Loading State Styling */
-        .loading-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 300px;
-          background-color: #ffffff;
-          border-radius: 12px;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-          margin: 40px auto;
-          padding: 20px;
-          max-width: 600px;
-        }
-
-        .spinner {
-          border: 6px solid #f3f3f3;
-          border-top: 6px solid #3498db;
-          border-radius: 50%;
-          width: 50px;
-          height: 50px;
-          animation: spin 1s linear infinite;
-          margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-          font-size: 1.2em;
-          color: #555;
-        }
-
-        /* No Applications Message */
-        .no-applications {
-          text-align: center;
-          font-size: 1.3em;
-          color: #777;
-          padding: 50px;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-          border: 1px dashed #ddd;
-          margin-top: 30px;
-        }
-
-        /* Table Styling */
-        .table-wrapper {
-          overflow-x: auto; /* Enables horizontal scrolling for small screens */
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          background-color: #fff;
-        }
-
-        .applications-table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          min-width: 900px; /* Ensures table doesn't shrink too much on small screens */
-        }
-
-        .applications-table th,
-        .applications-table td {
-          padding: 15px 20px;
-          text-align: left;
-          border-bottom: 1px solid #e0e0e0;
-          white-space: nowrap; /* Prevents text wrapping in cells */
-        }
-
-        .applications-table th {
-          background-color: #4a90e2;
-          color: #ffffff;
-          font-weight: 600;
-          text-transform: uppercase;
-          font-size: 0.9em;
-          letter-spacing: 0.5px;
-        }
-
-        .applications-table tbody tr:nth-child(even) {
-          background-color: #f8fbfd;
-        }
-
-        .applications-table tbody tr:hover {
-          background-color: #eaf3ff;
-          transition: background-color 0.2s ease;
-        }
-
-        /* Status Badges */
-        .status-badge {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 0.85em;
-          font-weight: 600;
-          text-transform: capitalize;
-          color: #fff;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-badge.status-pending {
-          background-color: #ffc107; /* Amber */
-          color: #333;
-        }
-          .status-badge.status-applied {
-          background-color: #17a2b8; /* Teal */
-          }
-
-        .status-badge.status-accepted {
-          background-color: #28a745; /* Green */
-        }
-
-        .status-badge.status-rejected {
-          background-color: #dc3545; /* Red */
-        }
-
-        .status-badge.status-interview {
-          background-color: #007bff; /* Blue */
-        }
-
-        /* Resume Link */
-        .resume-link {
-          color: #4a90e2;
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.2s ease;
-        }
-
-        .resume-link:hover {
-          color: #2e6bb8;
-          text-decoration: underline;
-        }
-
-        /* Profile Image */
-        .profile-img {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #ddd;
-          transition: transform 0.2s ease;
-        }
-
-        .profile-img:hover {
-          transform: scale(1.1);
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 992px) {
-          .applications-container {
-            margin: 20px;
-            padding: 20px;
-          }
-
-          h2 {
-            font-size: 1.8em;
-          }
-
-          .applications-table th,
-          .applications-table td {
-            padding: 12px 15px;
-            font-size: 0.9em;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .applications-container {
-            margin: 15px;
-            padding: 15px;
-          }
-
-          h2 {
-            font-size: 1.6em;
-            margin-bottom: 20px;
-          }
-
-          .applications-table {
-            min-width: 700px; /* Adjust minimum width for smaller tablets */
-          }
-
-          .applications-table th,
-          .applications-table td {
-            font-size: 0.85em;
-          }
-
-          .status-badge {
-            padding: 5px 10px;
-            font-size: 0.8em;
-          }
-
-          .profile-img {
-            width: 35px;
-            height: 35px;
-          }
-        }
-
-        @media (max-width: 576px) {
-          .applications-container {
-            margin: 10px;
-            padding: 10px;
-          }
-
-          h2 {
-            font-size: 1.4em;
-            margin-bottom: 15px;
-          }
-
-          .table-wrapper {
-            border-radius: 8px;
-          }
-
-          .applications-table {
-            min-width: 600px; /* Further adjust for mobile */
-          }
-
-          .applications-table th,
-          .applications-table td {
-            padding: 10px 12px;
-            font-size: 0.8em;
-          }
-
-          .loading-container {
-            margin: 20px;
-            padding: 15px;
-          }
-
-          .spinner {
-            width: 40px;
-            height: 40px;
-            border-width: 5px;
-          }
-
-          .loading-text {
-            font-size: 1em;
-          }
-
-          .no-applications {
-            padding: 30px;
-            font-size: 1.1em;
-          }
-        }
-      `}</style>
+              <div className="modal-footer-actions">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setEditingApp(null)}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={saving}
+                >
+                  {saving ? 'Updating...' : <><FaSave /> Save Status</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

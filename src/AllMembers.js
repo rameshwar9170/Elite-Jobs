@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getDatabase, ref, onValue, update, remove } from 'firebase/database';
+import { FaEdit, FaTrashAlt, FaTimes, FaSave } from 'react-icons/fa';
 import './AllMembers.css';
 
 const AllMembers = () => {
@@ -37,16 +38,6 @@ const AllMembers = () => {
     return () => unsubscribe();
   }, []);
 
-  const calculateTotalDiscount = (discount) => {
-    if (!discount) return 0;
-    return Object.values(discount).reduce((sum, d) => sum + (d.discountAmount || 0), 0);
-  };
-
-  const getDiscountCount = (discount) => {
-    if (!discount) return 0;
-    return Object.keys(discount).length;
-  };
-
   // Handle Edit
   const handleEdit = (member) => {
     setEditingMember(member.id);
@@ -58,33 +49,53 @@ const AllMembers = () => {
       district: member.district || '',
       hotelId: member.hotelId || '',
       subscriptionAmount: member.subscriptionAmount || 0,
-      hasActiveSubscription: member.hasActiveSubscription || false
+      subscriptionPlan: member.subscriptionPlan || '',
+      subscriptionExpiry: member.subscriptionExpiry || '',
+      hasActiveSubscription: member.hasActiveSubscription || false,
     });
   };
 
-  // Handle Save Edit
+  const handleCancelEdit = () => {
+    setEditingMember(null);
+    setEditForm({});
+  };
+
+  const handleFormChange = (field, value) => {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleSaveEdit = async () => {
-    if (!editingMember) return;
-    
     setActionLoading('saving');
     try {
       const db = getDatabase();
       const memberRef = ref(db, `members/${editingMember}`);
-      await update(memberRef, editForm);
+      
+      const updateData = {
+        name: editForm.name,
+        email: editForm.email,
+        phoneNumber: editForm.phoneNumber,
+        address: editForm.address,
+        district: editForm.district,
+        hotelId: editForm.hotelId,
+        subscriptionAmount: Number(editForm.subscriptionAmount),
+        subscriptionPlan: editForm.subscriptionPlan,
+        subscriptionExpiry: editForm.subscriptionExpiry,
+        hasActiveSubscription: editForm.hasActiveSubscription,
+        lastUpdated: new Date().toISOString()
+      };
+
+      await update(memberRef, updateData);
       setEditingMember(null);
       setEditForm({});
-      setActionLoading('');
     } catch (error) {
       console.error('Error updating member:', error);
-      alert('Failed to update member. Please try again.');
+      alert('Failed to update member: ' + error.message);
+    } finally {
       setActionLoading('');
     }
-  };
-
-  // Handle Cancel Edit
-  const handleCancelEdit = () => {
-    setEditingMember(null);
-    setEditForm({});
   };
 
   // Handle Delete
@@ -95,249 +106,242 @@ const AllMembers = () => {
       const memberRef = ref(db, `members/${memberId}`);
       await remove(memberRef);
       setShowDeleteModal(null);
-      setActionLoading('');
     } catch (error) {
       console.error('Error deleting member:', error);
-      alert('Failed to delete member. Please try again.');
+      alert('Failed to delete member: ' + error.message);
+    } finally {
       setActionLoading('');
     }
   };
 
-  // Handle Form Change
-  const handleFormChange = (field, value) => {
-    setEditForm(prev => ({
-      ...prev,
-      [field]: field === 'subscriptionAmount' ? Number(value) : value
-    }));
-  };
-
   if (loading) {
-    return <div className="loading">🔄 Loading members...</div>;
+    return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>⏳ Loading members...</div>;
   }
 
   if (error) {
-    return <div className="error">❌ {error}</div>;
+    return <div className="error-message" style={{ textAlign: 'center', padding: '2rem', color: '#ef4444' }}>❌ {error}</div>;
   }
 
   if (members.length === 0) {
-    return <div className="no-members">📋 No members found.</div>;
+    return <div className="no-members" style={{ textAlign: 'center', padding: '3rem' }}>📋 No members found.</div>;
   }
 
   return (
     <div className="all-members-container">
       <h1 className="title">👥 All Members ({members.length})</h1>
-      <div className="members-grid">
-        {members.map(member => (
-          <div className="member-card" key={member.id}>
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button 
-                className="edit-btn"
-                onClick={() => handleEdit(member)}
-                disabled={actionLoading}
-              >
-                ✏️
-              </button>
-              <button 
-                className="delete-btn"
-                onClick={() => setShowDeleteModal(member.id)}
-                disabled={actionLoading}
-              >
-                🗑️
+
+      <div className="table-responsive-container">
+        <table className="modern-data-table">
+          <thead>
+            <tr>
+              <th>Member Name & Contact</th>
+              <th>Address / District</th>
+              <th>Hotel ID</th>
+              <th>Plan</th>
+              <th>Amount</th>
+              <th>Expiry</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {members.map((member) => (
+              <tr key={member.id} className="table-row-hover">
+                <td>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{member.name || 'No Name'}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {member.email || member.phoneNumber || '-'}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span style={{ fontSize: '0.82rem' }}>
+                    {[member.address, member.district].filter(Boolean).join(', ') || '-'}
+                  </span>
+                </td>
+                <td>{member.hotelId || '-'}</td>
+                <td>
+                  <span className="badge-light">{member.subscriptionPlan || 'Default'}</span>
+                </td>
+                <td>₹{member.subscriptionAmount || 0}</td>
+                <td style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                  {member.subscriptionExpiry ? new Date(member.subscriptionExpiry).toLocaleDateString() : '-'}
+                </td>
+                <td>
+                  <span className={`status-pill ${member.hasActiveSubscription ? 'status-open' : 'status-closed'}`}>
+                    {member.hasActiveSubscription ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td>
+                  <div className="table-action-btns">
+                    <button
+                      className="table-action-btn edit-btn"
+                      onClick={() => handleEdit(member)}
+                      disabled={!!actionLoading}
+                      title="Edit Member"
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      className="table-action-btn delete-btn"
+                      onClick={() => setShowDeleteModal(member.id)}
+                      disabled={!!actionLoading}
+                      title="Delete Member"
+                    >
+                      <FaTrashAlt /> Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Edit Modal */}
+      {editingMember && (
+        <div className="modal-backdrop-overlay" onClick={handleCancelEdit}>
+          <div className="modal-content-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3><FaEdit style={{ color: '#2563eb', marginRight: '8px' }} /> Edit Member</h3>
+              <button className="modal-close-icon" onClick={handleCancelEdit}>
+                <FaTimes />
               </button>
             </div>
 
-            {editingMember === member.id ? (
-              /* Edit Form */
-              <div className="edit-form">
-                <h3 className="edit-title">✏️ Edit Member</h3>
-                
-                <div className="form-group">
+            <div className="modal-form">
+              <div className="modal-form-grid">
+                <div className="form-field-group">
                   <label>Name:</label>
                   <input
                     type="text"
                     value={editForm.name}
                     onChange={(e) => handleFormChange('name', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-field-group">
                   <label>Email:</label>
                   <input
                     type="email"
                     value={editForm.email}
                     onChange={(e) => handleFormChange('email', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-field-group">
                   <label>Phone:</label>
                   <input
                     type="text"
                     value={editForm.phoneNumber}
                     onChange={(e) => handleFormChange('phoneNumber', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Address:</label>
-                  <input
-                    type="text"
-                    value={editForm.address}
-                    onChange={(e) => handleFormChange('address', e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="form-group">
+                <div className="form-field-group">
                   <label>District:</label>
                   <input
                     type="text"
                     value={editForm.district}
                     onChange={(e) => handleFormChange('district', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="form-field-group">
+                  <label>Address:</label>
+                  <input
+                    type="text"
+                    value={editForm.address}
+                    onChange={(e) => handleFormChange('address', e.target.value)}
+                  />
+                </div>
+
+                <div className="form-field-group">
                   <label>Hotel ID:</label>
                   <input
                     type="text"
                     value={editForm.hotelId}
                     onChange={(e) => handleFormChange('hotelId', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Subscription Amount:</label>
+                <div className="form-field-group">
+                  <label>Subscription Amount (₹):</label>
                   <input
                     type="number"
                     value={editForm.subscriptionAmount}
                     onChange={(e) => handleFormChange('subscriptionAmount', e.target.value)}
-                    className="form-input"
                   />
                 </div>
 
-                <div className="form-group checkbox-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={editForm.hasActiveSubscription}
-                      onChange={(e) => handleFormChange('hasActiveSubscription', e.target.checked)}
-                    />
+                <div className="form-field-group">
+                  <label>Subscription Plan:</label>
+                  <input
+                    type="text"
+                    value={editForm.subscriptionPlan}
+                    onChange={(e) => handleFormChange('subscriptionPlan', e.target.value)}
+                  />
+                </div>
+
+                <div className="form-field-group full-width" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="hasActiveSubCheck"
+                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    checked={editForm.hasActiveSubscription}
+                    onChange={(e) => handleFormChange('hasActiveSubscription', e.target.checked)}
+                  />
+                  <label htmlFor="hasActiveSubCheck" style={{ cursor: 'pointer', margin: 0 }}>
                     Active Subscription
                   </label>
                 </div>
-
-                <div className="form-actions">
-                  <button 
-                    className="save-btn"
-                    onClick={handleSaveEdit}
-                    disabled={actionLoading === 'saving'}
-                  >
-                    {actionLoading === 'saving' ? '⏳ Saving...' : '💾 Save'}
-                  </button>
-                  <button 
-                    className="cancel-btn"
-                    onClick={handleCancelEdit}
-                    disabled={actionLoading === 'saving'}
-                  >
-                    ❌ Cancel
-                  </button>
-                </div>
               </div>
-            ) : (
-              /* Display Mode */
-              <>
-                <div className="member-header">
-                  <h3 className="member-name">{member.name || 'No Name'}</h3>
-                  <span className={`status ${member.hasActiveSubscription ? 'active' : 'inactive'}`}>
-                    {member.hasActiveSubscription ? '✅' : '❌'}
-                  </span>
-                </div>
-                
-                <div className="member-info">
-                  <div className="info-row">
-                    <span className="label">📧</span>
-                    <span className="value">{member.email || 'N/A'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">📱</span>
-                    <span className="value">{member.phoneNumber || 'N/A'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">📍</span>
-                    <span className="value">{member.address || 'N/A'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">🏨</span>
-                    <span className="value">{member.hotelId || 'N/A'}</span>
-                  </div>
-                </div>
 
-                <div className="subscription-info">
-                  <div className="section-title">💳 Subscription</div>
-                  <div className="info-row">
-                    <span className="label">Plan:</span>
-                    <span className="value">{member.subscriptionPlan || 'N/A'}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Amount:</span>
-                    <span className="value">₹{member.subscriptionAmount || 0}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="label">Expiry:</span>
-                    <span className="value">
-                      {member.subscriptionExpiry 
-                        ? new Date(member.subscriptionExpiry).toLocaleDateString() 
-                        : 'N/A'}
-                    </span>
-                  </div>
-                </div>
-
-                {member.discount && (
-                  <div className="discount-info">
-                    <div className="section-title">🎫 Discounts</div>
-                    <div className="discount-stats">
-                      <span className="stat">
-                        <strong>{getDiscountCount(member.discount)}</strong> Used
-                      </span>
-                      <span className="stat">
-                        <strong>₹{calculateTotalDiscount(member.discount)}</strong> Saved
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+              <div className="modal-footer-actions">
+                <button 
+                  className="btn-secondary"
+                  onClick={handleCancelEdit}
+                  disabled={actionLoading === 'saving'}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn-primary"
+                  onClick={handleSaveEdit}
+                  disabled={actionLoading === 'saving'}
+                >
+                  {actionLoading === 'saving' ? 'Saving...' : <><FaSave /> Save Member</>}
+                </button>
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>🗑️ Delete Member</h3>
-            <p>Are you sure you want to delete this member? This action cannot be undone.</p>
-            <div className="modal-actions">
+        <div className="modal-backdrop-overlay" onClick={() => setShowDeleteModal(null)}>
+          <div className="modal-content-card" style={{ maxWidth: '420px', padding: '1.5rem' }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#ef4444' }}><FaTrashAlt /> Delete Member</h3>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
+              Are you sure you want to delete this member? This action cannot be undone.
+            </p>
+            <div className="modal-footer-actions">
               <button 
-                className="confirm-delete-btn"
-                onClick={() => handleDelete(showDeleteModal)}
-                disabled={actionLoading === 'deleting'}
-              >
-                {actionLoading === 'deleting' ? '⏳ Deleting...' : '🗑️ Delete'}
-              </button>
-              <button 
-                className="cancel-modal-btn"
+                className="btn-secondary"
                 onClick={() => setShowDeleteModal(null)}
                 disabled={actionLoading === 'deleting'}
               >
-                ❌ Cancel
+                Cancel
+              </button>
+              <button 
+                className="table-action-btn delete-btn"
+                style={{ padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
+                onClick={() => handleDelete(showDeleteModal)}
+                disabled={actionLoading === 'deleting'}
+              >
+                {actionLoading === 'deleting' ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
           </div>

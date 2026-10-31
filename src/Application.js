@@ -144,14 +144,20 @@ const Application = () => {
       const name = (p.name || '').toLowerCase();
       const email = (p.email || '').toLowerCase();
       const district = (p.district || '').toLowerCase();
-      const query = searchTerm.toLowerCase();
+      const query = searchTerm.toLowerCase().trim();
+
+      const phoneRaw = String(p.phone || p.mobile || p.phoneNumber || p.contactNumber || p.contactPhone || '');
+      const phoneDigits = phoneRaw.replace(/\D/g, '');
+      const queryDigits = query.replace(/\D/g, '');
+      const matchesPhone = phoneRaw.toLowerCase().includes(query) || (queryDigits.length >= 3 && phoneDigits.includes(queryDigits));
 
       return (
         !searchTerm ||
         company.includes(query) ||
         name.includes(query) ||
         email.includes(query) ||
-        district.includes(query)
+        district.includes(query) ||
+        matchesPhone
       );
     });
   }, [providers, searchTerm]);
@@ -164,7 +170,7 @@ const Application = () => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search provider company or recruiter to view job applications..."
+            placeholder="Search provider company, mobile number or recruiter..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="apps-search-input"

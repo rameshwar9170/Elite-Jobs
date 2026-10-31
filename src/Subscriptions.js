@@ -61,16 +61,20 @@ const Subscriptions = () => {
     const result = users.filter((u) => {
       const name = (u.name || u.companyName || '').toLowerCase();
       const email = (u.email || '').toLowerCase();
-      const phone = (u.phone || '').toLowerCase();
       const district = (u.district || '').toLowerCase();
-      const q = searchTerm.toLowerCase();
+      const q = searchTerm.toLowerCase().trim();
+
+      const phoneRaw = String(u.phone || u.mobile || u.phoneNumber || u.contactNumber || '');
+      const phoneDigits = phoneRaw.replace(/\D/g, '');
+      const qDigits = q.replace(/\D/g, '');
+      const matchesPhone = phoneRaw.toLowerCase().includes(q) || (qDigits.length >= 3 && phoneDigits.includes(qDigits));
 
       const matchesSearch =
         !searchTerm ||
         name.includes(q) ||
         email.includes(q) ||
-        phone.includes(q) ||
-        district.includes(q);
+        district.includes(q) ||
+        matchesPhone;
 
       if (!matchesSearch) return false;
 

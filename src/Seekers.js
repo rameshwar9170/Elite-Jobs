@@ -180,17 +180,25 @@ const Seekers = ({ onSeekerClick }) => {
       const name = (seeker.name || '').toLowerCase();
       const designation = (seeker.designation || '').toLowerCase();
       const district = (seeker.district || '').toLowerCase();
+      const email = (seeker.email || '').toLowerCase();
       const skillsStr = Array.isArray(seeker.skills)
         ? seeker.skills.join(' ').toLowerCase()
         : (seeker.skills || '').toLowerCase();
-      const query = searchTerm.toLowerCase();
+      const query = searchTerm.toLowerCase().trim();
+
+      const phoneRaw = String(seeker.phone || seeker.mobile || seeker.phoneNumber || seeker.contactNumber || '');
+      const phoneDigits = phoneRaw.replace(/\D/g, '');
+      const queryDigits = query.replace(/\D/g, '');
+      const matchesPhone = phoneRaw.toLowerCase().includes(query) || (queryDigits.length >= 3 && phoneDigits.includes(queryDigits));
 
       const matchesSearch =
         !searchTerm ||
         name.includes(query) ||
         designation.includes(query) ||
         district.includes(query) ||
-        skillsStr.includes(query);
+        skillsStr.includes(query) ||
+        email.includes(query) ||
+        matchesPhone;
 
       if (!matchesSearch) return false;
 
@@ -213,7 +221,7 @@ const Seekers = ({ onSeekerClick }) => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search candidates, skills, location..."
+            placeholder="Search candidates, mobile number, skills, location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -303,7 +311,15 @@ const Seekers = ({ onSeekerClick }) => {
                       </div>
                       <div>
                         <div className="table-candidate-name">{seeker.name || 'Unnamed'}</div>
-                        <div className="table-candidate-contact">{seeker.email || seeker.phone || 'No contact'}</div>
+                        {seeker.email && <div className="table-candidate-contact">{seeker.email}</div>}
+                        {(seeker.phone || seeker.mobile || seeker.phoneNumber || seeker.contactNumber) && (
+                          <div style={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600, marginTop: '2px' }}>
+                            📞 {seeker.phone || seeker.mobile || seeker.phoneNumber || seeker.contactNumber}
+                          </div>
+                        )}
+                        {!seeker.email && !seeker.phone && !seeker.mobile && !seeker.phoneNumber && !seeker.contactNumber && (
+                          <div className="table-candidate-contact">No contact</div>
+                        )}
                       </div>
                     </div>
                   </td>

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { getDatabase, ref, onValue, update, remove } from 'firebase/database';
-import { FaEdit, FaTrashAlt, FaTimes, FaSave } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaTimes, FaSave, FaSearch } from 'react-icons/fa';
 import './AllMembers.css';
 
 const AllMembers = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(null);
@@ -114,6 +115,36 @@ const AllMembers = () => {
     }
   };
 
+  // Filtered members by search (including mobile number)
+  const filteredMembers = useMemo(() => {
+    if (!searchTerm.trim()) return members;
+    const query = searchTerm.toLowerCase().trim();
+    const queryDigits = query.replace(/\D/g, '');
+
+    return members.filter((member) => {
+      const name = (member.name || '').toLowerCase();
+      const email = (member.email || '').toLowerCase();
+      const address = (member.address || '').toLowerCase();
+      const district = (member.district || '').toLowerCase();
+      const hotelId = (member.hotelId || '').toLowerCase();
+      const plan = (member.subscriptionPlan || '').toLowerCase();
+
+      const phoneRaw = String(member.phoneNumber || member.phone || member.mobile || member.contactNumber || '');
+      const phoneDigits = phoneRaw.replace(/\D/g, '');
+      const matchesPhone = phoneRaw.toLowerCase().includes(query) || (queryDigits.length >= 3 && phoneDigits.includes(queryDigits));
+
+      return (
+        name.includes(query) ||
+        email.includes(query) ||
+        address.includes(query) ||
+        district.includes(query) ||
+        hotelId.includes(query) ||
+        plan.includes(query) ||
+        matchesPhone
+      );
+    });
+  }, [members, searchTerm]);
+
   if (loading) {
     return <div className="loading" style={{ textAlign: 'center', padding: '3rem' }}>⏳ Loading members...</div>;
   }
@@ -128,31 +159,80 @@ const AllMembers = () => {
 
   return (
     <div className="all-members-container">
-      <h1 className="title">👥 All Members ({members.length})</h1>
+      <h1 className="title">👥 All Members ({filteredMembers.length}{filteredMembers.length !== members.length ? ` of ${members.length}` : ''})</h1>
 
-      <div className="table-responsive-container">
-        <table className="modern-data-table">
-          <thead>
-            <tr>
-              <th>Member Name & Contact</th>
-              <th>Address / District</th>
-              <th>Hotel ID</th>
-              <th>Plan</th>
-              <th>Amount</th>
-              <th>Expiry</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'center' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr key={member.id} className="table-row-hover">
+      {/* Search Header */}
+      <div className="members-search-wrapper">
+        <div className="members-search-box">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search member by mobile number, name, email, district, hotel ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          {searchTerm && (
+            <button className="clear-btn" onClick={() => setSearchTerm('')} title="Clear search">
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {filteredMembers.length === 0 ? (
+        <div className="no-members" style={{ textAlign: 'center', padding: '3rem', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', marginTop: '1rem' }}>
+          <p style={{ fontSize: '1.1rem', color: '#64748b', fontWeight: 600 }}>🔍 No members found matching "{searchTerm}".</p>
+          <button
+            onClick={() => setSearchTerm('')}
+            style={{
+              marginTop: '12px',
+              padding: '8px 18px',
+              borderRadius: '8px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 600
+            }}
+          >
+            Clear Search
+          </button>
+        </div>
+      ) : (
+        <div className="table-responsive-container">
+          <table className="modern-data-table">
+            <thead>
+              <tr>
+                <th>Member Name & Contact</th>
+                <th>Address / District</th>
+                <th>Hotel ID</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMembers.map((member) => (
+                <tr key={member.id} className="table-row-hover">
                 <td>
                   <div>
                     <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>{member.name || 'No Name'}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      {member.email || member.phoneNumber || '-'}
-                    </div>
+                    {member.email && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {member.email}
+                      </div>
+                    )}
+                    {(member.phoneNumber || member.phone || member.mobile) && (
+                      <div style={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600, marginTop: '2px' }}>
+                        📞 {member.phoneNumber || member.phone || member.mobile}
+                      </div>
+                    )}
+                    {!member.email && !member.phoneNumber && !member.phone && !member.mobile && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>-</div>
+                    )}
                   </div>
                 </td>
                 <td>
@@ -198,6 +278,7 @@ const AllMembers = () => {
           </tbody>
         </table>
       </div>
+      )}
 
       {/* Edit Modal */}
       {editingMember && (

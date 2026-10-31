@@ -171,7 +171,13 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
       const district = (p.district || '').toLowerCase();
       const industry = (p.industry || '').toLowerCase();
       const loc = (p.location || '').toLowerCase();
-      const query = searchTerm.toLowerCase();
+      const email = (p.email || '').toLowerCase();
+      const query = searchTerm.toLowerCase().trim();
+
+      const phoneRaw = String(p.phone || p.mobile || p.phoneNumber || p.contactNumber || p.contactPhone || '');
+      const phoneDigits = phoneRaw.replace(/\D/g, '');
+      const queryDigits = query.replace(/\D/g, '');
+      const matchesPhone = phoneRaw.toLowerCase().includes(query) || (queryDigits.length >= 3 && phoneDigits.includes(queryDigits));
 
       const matchesSearch =
         !searchTerm ||
@@ -179,7 +185,9 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
         contact.includes(query) ||
         district.includes(query) ||
         industry.includes(query) ||
-        loc.includes(query);
+        loc.includes(query) ||
+        email.includes(query) ||
+        matchesPhone;
 
       if (!matchesSearch) return false;
 
@@ -199,7 +207,7 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search company, recruiter, district, industry..."
+            placeholder="Search company, mobile number, recruiter, district..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -286,16 +294,31 @@ const Providers = ({ onProviderClick, onAddJobClick }) => {
                         </div>
                         <div>
                           <div className="table-company-name">{displayName}</div>
-                          <div className="table-contact-sub">{provider.email || provider.phone || 'No contact'}</div>
+                          {provider.email && <div className="table-contact-sub">{provider.email}</div>}
+                          {(provider.phone || provider.mobile || provider.phoneNumber || provider.contactNumber) && (
+                            <div style={{ fontSize: '0.78rem', color: '#2563eb', fontWeight: 600, marginTop: '2px' }}>
+                              📞 {provider.phone || provider.mobile || provider.phoneNumber || provider.contactNumber}
+                            </div>
+                          )}
+                          {!provider.email && !provider.phone && !provider.mobile && !provider.phoneNumber && !provider.contactNumber && (
+                            <div className="table-contact-sub">No contact</div>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td>
-                      {provider.name && provider.name !== displayName ? (
-                        <span style={{ fontWeight: 600 }}>{provider.name}</span>
-                      ) : (
-                        <span className="text-muted-sm">-</span>
-                      )}
+                      <div>
+                        {provider.name && provider.name !== displayName ? (
+                          <div style={{ fontWeight: 600 }}>{provider.name}</div>
+                        ) : null}
+                        {(provider.phone || provider.mobile || provider.phoneNumber || provider.contactNumber) ? (
+                          <div style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 500 }}>
+                            📞 {provider.phone || provider.mobile || provider.phoneNumber || provider.contactNumber}
+                          </div>
+                        ) : (!provider.name || provider.name === displayName) ? (
+                          <span className="text-muted-sm">-</span>
+                        ) : null}
+                      </div>
                     </td>
                     <td>
                       {provider.industry ? (
